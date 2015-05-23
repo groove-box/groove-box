@@ -13,9 +13,10 @@ var FAILURE = "failure";
 
 function playURL(url) {
 
-	// TODO play stuff
- 	console.log('Just received URL: ' + url + ' for playback');
+ 	console.log('Just received URL: \'' + url + '\' for playback');
 
+	// TODO play stuff
+	
 	return SUCCESS;
 }
 
@@ -23,10 +24,14 @@ app.get('/status', function (req, res) {
   res.send('Everything is OK!');
 });
 
-app.post('/play', function (req, res) {
+app.put('/play', function (req, res) {
 
 	// echo body to client
  	console.log(req.body);
+	console.log('-------');
+
+	playURL(req.body.song);
+ 
  	res.json(req.body);
 });
 
