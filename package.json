@@ -1,0 +1,26 @@
+{
+  "name": "GrooveBox_Player",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "player": "^0.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GrooveBoxHH/GrooveBox_Player.git"
+  },
+  "keywords": [
+    "awesomeness"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GrooveBoxHH/GrooveBox_Player/issues"
+  },
+  "homepage": "https://github.com/GrooveBoxHH/GrooveBox_Player"
+}
