@@ -8,29 +8,45 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(multer()); // for parsing multipart/form-data
 
-var callbackFunction = null;
+var postCallback = null;
+var nextCallback = null;
+var stopCallback = null;
 
-function postHandler (req, res) {
+function Server(runPort) {
+	this.port = runPort;
+}
+
+Server.prototype.init = function(urlCallback, nextReceivedCallback, stopReceivedCallback) {
+
+	postCallback = urlCallback;
+	nextCallback = nextReceivedCallback;
+	stopCallback = stopReceivedCallback;
+}
+
+Server.prototype.nextHandler =  function(req, res) {
+
+	nextCallback();
+}
+
+Server.prototype.stopHandler =  function(req, res) {
+
+	stopCallback();
+}
+
+Server.prototype.postHandler =  function(req, res) {
 
 	// echo body to client
  	console.log(req.body);
 	console.log('-------');
 
-	callbackFunction(req.body.url)
+	postCallback(req.body.url)
  
  	res.json(req.body);
 }
 
-app.post('/play', postHandler);
-
-function Server(runPort) { 
-	this.port = runPort;
-}
-
-Server.prototype.init = function(callback) {
-
-	callbackFunction = callback;
-}
+app.get('/next', Server.prototype.nextHandler);
+app.get('/stop', Server.prototype.stopHandler);
+app.post('/play', Server.prototype.postHandler);
 
 Server.prototype.start = function() {
 
@@ -45,5 +61,6 @@ Server.prototype.start = function() {
 Server.prototype.player_errorHandler = function(err) {
         console.log(err);
 }
+
 
 module.exports = Server;
