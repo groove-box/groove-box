@@ -1,7 +1,14 @@
 
-function urlReceivedCallback (url) {
+var SoundcloudWrapper = require('./libs/soundcloud_wrapper');
 
+var sc = new SoundcloudWrapper();
+sc.init();
+
+function urlReceivedCallback (url) {
  	console.log('Just received URL: \'' + url + '\' for playback');
+  sc.resolve(url, function(resolvedObject) {
+    console.log("Body: ", resolvedObject);
+  });
 }
 
 var Server = require('./libs/server');
