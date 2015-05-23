@@ -25,5 +25,6 @@
   "homepage": "https://github.com/GrooveBoxHH/GrooveBox_Player#readme",
   "dependencies": {
     "express": "^4.12.4"
-  }
+  },
+  "devDependencies": {}
 }
