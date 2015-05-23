@@ -8,21 +8,14 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(multer()); // for parsing multipart/form-data
 
-var SUCCESS = "success";
-var FAILURE = "failure";
-
 function playURL(url) {
 
  	console.log('Just received URL: \'' + url + '\' for playback');
 
 	// TODO play stuff
-	
-	return SUCCESS;
-}
 
-app.get('/status', function (req, res) {
-  res.send('Everything is OK!');
-});
+	return 'SUCCESS';
+}
 
 app.put('/play', function (req, res) {
 
@@ -36,10 +29,8 @@ app.put('/play', function (req, res) {
 });
 
 var server = app.listen(1337, function () {
-
-  var host = server.address().address;
   var port = server.address().port;
 
-  console.log('Example app listening at http://%s%s', host, port);
+  console.log('Server running: http://localhost%s/play', port);
 
 });
