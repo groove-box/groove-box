@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "player": "^0.5.0",
+    "body-parser": "^1.12.4",
     "express": "^4.12.4",
+    "multer": "^0.1.8",
+    "player": "^0.5.0",
     "soundcloud-nodejs-api-wrapper": "git://github.com/monbro/soundcloud-nodejs-api-wrapper.git"
   },
   "devDependencies": {
