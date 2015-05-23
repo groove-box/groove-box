@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/GrooveBoxHH/GrooveBox_Player/issues"
   },
-  "homepage": "https://github.com/GrooveBoxHH/GrooveBox_Player"
+  "homepage": "https://github.com/GrooveBoxHH/GrooveBox_Player#readme",
+  "dependencies": {
+    "express": "^4.12.4"
+  }
 }
