@@ -2,7 +2,7 @@ var https = require('https');
 SC = require('soundcloud-nodejs-api-wrapper');
 
 var request = require('request');
-var config = require('../config/config.json');
+var config = require('../config/config');
 var sc;
 var access_token;
 var client;
@@ -15,10 +15,10 @@ function SoundcloudWrapper() {
 
 SoundcloudWrapper.prototype.init = function() {
   var sc = new SC({
-    client_id :     config.client_id,
-    client_secret : config.client_secret,
-    username :      config.username,
-    password:       config.password
+    client_id :     config.credentials.client_id,
+    client_secret : config.credentials.client_secret,
+    username :      config.credentials.username,
+    password:       config.credentials.password
   });
 
   var client = sc.client();
@@ -44,7 +44,7 @@ SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback, error) {
         });
         res.on('end', function () {
           var song = JSON.parse(body);
-          request(song.stream_url + '?client_id=' + config.client_id, function (error, response, body) {
+          request(song.stream_url + '?client_id=' + config.credentials.client_id, function (error, response, body) {
             callback({
               src: response['request'].uri.href,
               track_data: song

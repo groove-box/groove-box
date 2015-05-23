@@ -1,11 +1,11 @@
 var querystring = require('querystring');
 var http = require('http');
-var fs = require('fs');
+var config = require('../config/config');
 
 function Tweeter(tohost, topath, toport) {
-  this.host = tohost;
-  this.path = topath;
-  this.port = toport;
+  this.host = config.tweeter.host;
+  this.port = config.tweeter.port;
+  this.path = config.tweeter.path;
 }
 
 Tweeter.prototype.tweet = function (title, url) {
