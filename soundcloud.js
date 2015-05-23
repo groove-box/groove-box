@@ -4,5 +4,5 @@ var sc = new SoundcloudWrapper();
 sc.init();
 var url = "https://soundcloud.com/twaynemusic/01-t-wayne-i-be-killin-it-prod?in=twaynemusic/sets/t-wayne-who-is-rickey-wayne";
 sc.resolve(url, function(resolvedObject) {
-  console.log(resolvedObject.stream_url);
+  console.log(resolvedObject);
 });

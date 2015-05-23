@@ -34,9 +34,7 @@ SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback) {
     https.get(result.location, function(res) {
       res.setEncoding('utf8');
       res.on('data', function (chunk) {
-        if(chunk != undefined) {
-          callback(JSON.parse(chunk));
-        }
+        callback(chunk);
       });
     });
   });
