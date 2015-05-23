@@ -6,7 +6,9 @@
   "dependencies": {
     "player": "^0.5.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "debug": "^2.2.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
