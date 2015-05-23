@@ -11,38 +11,6 @@ function PlayerWrapper() {
 	this.tweeter = new Tweeter();
 }
 
-PlayerWrapper.prototype.errorHandler = function(err) {
-	console.log(err);
-}
-
-PlayerWrapper.prototype.playStartHandler = function(uri) {
-	var playlistData = this.getPlayListData(uri);
-
-	if (playlistData) {
-		this.tweeter.tweet(playlistData.track_data.title, playlistData.track_data.permalink_url);
-	}
-}
-
-PlayerWrapper.prototype.playEndHandler = function(uri) {
-	var playlistData = this.getPlayListData(uri);
-
-	playlistData.played++;
-
-	// Remove the entry here, because we do not want it to be in the playlist
-	// again. But since we are not adding the new sorted playlist yet, we do
-	// not need to remove the entry here.
-	this._removeEntryFromPlaylist(uri);
-	// @TODO: Re-apply the list to the player.
-}
-
-PlayerWrapper.prototype.isInitialized = function () {
-	return this.player_initialized;
-}
-
-PlayerWrapper.prototype.isPlaying = function () {
-	return this.player.playing !== null;
-}
-
 PlayerWrapper.prototype.init = function() {
 	if (this.isInitialized()) {
 		return;
@@ -63,49 +31,87 @@ PlayerWrapper.prototype.init = function() {
 		});
 }
 
-PlayerWrapper.prototype.add = function(uri) {
+PlayerWrapper.prototype.errorHandler = function(err) {
+	console.log(err);
+}
+
+PlayerWrapper.prototype.playStartHandler = function(item) {
+	this.tweeter.tweet(item.track_data.title, item.track_data.permalink_url);
+}
+
+PlayerWrapper.prototype.playEndHandler = function(item) {
+	item.played++;
+	item.finished = true;
+
+	// Remove the entry here, because we do not want it to be in the playlist
+	// again. But since we are not adding the new sorted playlist yet, we do
+	// not need to remove the entry here.
+	this._removeEntryFromPlaylist(item);
+	// @TODO: Re-apply the list to the player.
+}
+
+PlayerWrapper.prototype.isInitialized = function () {
+	return this.player_initialized;
+}
+
+PlayerWrapper.prototype.isPlaying = function () {
+	var currentTrack = this.player.playing;
+
+	var result = !!currentTrack && (currentTrack.finished === false);
+
+	return result;
+}
+
+PlayerWrapper.prototype.getNextTrackIndex = function() {
+	return this.player.history.length;
+}
+
+PlayerWrapper.prototype.add = function(data) {
 	if (!this.isInitialized()) {
 		this.init();
 	}
 
-	this.player.add(uri);
+	this.player.add(data);
 
+	// @TODO: Fixme. If the player finished a file and is idle
+	// and a new song is pushed, this does either not trigger at
+	// and if plays the whole playlist again.
 	if (!this.isPlaying()) {
-		this.player.play();
+		var nextTrackIndex = this.getNextTrackIndex();
+		this.player.play(nextTrackIndex);
 	}
 }
 
 PlayerWrapper.prototype.addToPlaylist = function(data) {
-	var playlistData = this.getPlayListData(data.stream_url);
-	var is_new_entry = false;
-	if (!playlistData) {
-		playlistData = this._generateNewPlaylistItem(data);
-		is_new_entry = true
+	if (!this.isInitialized()) {
+		this.init();
+	}
+
+	var playlistItem = this.getPlaylistItem(data);
+	var is_new_entry = !playlistItem;
+	if (is_new_entry) {
+		playlistItem = this._generateNewPlaylistItem(data);
 	}
 	else {
 		// @TODO: Fixme. This is not working or it is not reaching here.
-		playlistData.votes++;
+		playlistItem.votes++;
+		playlistItem.finished = false;
 	}
 
-	this.playlist.push(playlistData.stream_url);
-	// @TODO: Fixme. Hash the stream url with sha1.
-	this.playlistData[playlistData.stream_url] = playlistData;
-
-	this.add(playlistData.stream_url);
-	console.log(playlistData);
+	this.add(playlistItem);
 
 	this._sortPlaylistByVotes();
 
 	// @TODO: Re-apply the list to the player.
 }
 
-PlayerWrapper.prototype.getPlayListData = function(stream_url) {
+PlayerWrapper.prototype.getPlaylistItem = function(data) {
 	var result;
 
-	for (var i = 0; i < this.playlistData.length; i++) {
-		var cur = this.playlist[i];
+	for (var i = 0; i < this.player._list.length; i++) {
+		var cur = this.player._list[i];
 
-		if (cur.stream_url === stream_url) {
+		if (cur.track_data.id === data.track_data.id) {
 			result = cur;
 			break;
 		}
@@ -119,36 +125,31 @@ PlayerWrapper.prototype._generateNewPlaylistItem = function(data) {
 
 	result.votes = 1;
 	result.played = 0;
+	result.finished = false;
 
 	return result;
 }
 
 PlayerWrapper.prototype._sortPlaylistByVotes = function() {
-	this.playlist.sort(this._sortPlaylistByVotesCallback.apply(this));
+	// @TODO: Fixme.
+	// this.playlist.sort(this._sortPlaylistByVotesCallback.apply(this));
 }
 
 PlayerWrapper.prototype._sortPlaylistByVotesCallback = function(a, b) {
-	var result = 0;
-	var a_playlistData = this.getPlayListData(a);
-	var b_playlistData = this.getPlayListData(b);
-
-	if (a_playlistData && b_playlistData) {
-		// We are sorting descending here, so the numbers are reversed.
-		if (a_playlistData.votes > b_playlistData.votes) {
-			result = -1;
-		}
-		else if(a_playlistData.votes < b_playlistData.votes) {
-			result = 1;
-		}
+	// We are sorting descending here, so the numbers are reversed.
+	if (a_playlistData.votes > b_playlistData.votes) {
+		result = -1;
+	}
+	else if(a_playlistData.votes < b_playlistData.votes) {
+		result = 1;
 	}
 
 	return result;
 }
 
-PlayerWrapper.prototype._removeEntryFromPlaylist = function(stream_url) {
-	var playlistData = this.getPlayListData(stream_url);
-
-	this.playlist.filter(this._removeEntryFromPlaylistCallback, playlistData);
+PlayerWrapper.prototype._removeEntryFromPlaylist = function(item) {
+	// @TODO: Fixme.
+	// this.playlist.filter(this._removeEntryFromPlaylistCallback, playlistData);
 }
 
 PlayerWrapper.prototype._removeEntryFromPlaylistCallback = function(index, value, targetArray) {
