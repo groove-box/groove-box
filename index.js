@@ -4,19 +4,19 @@ var PlayerWrapper = require('./libs/player_wrapper');
 var Server = require('./libs/server');
 
 
-var sc = new SoundcloudWrapper();
+var soundcloudWrapper = new SoundcloudWrapper();
 var playerWrapper = new PlayerWrapper();
-sc.init();
+soundcloudWrapper.init();
 
 function urlReceivedCallback (url) {
- 	console.log('Just received URL: \'', url, '\' for playback');
-  sc.resolve(url, function(track_hash) {
-    //Getting stream_url and track_data
-    console.log("Added resolved URL: ", track_hash.stream_url)
-    playerWrapper.addPlaylist(track_hash);
-  }, function() {
-    console.log("Invalid URL");
-  });
+	console.log('Received URL:' , url);
+	soundcloudWrapper.resolve(url, function(track_hash) {
+		// Getting stream_url and track_data.
+		console.log('Added resolved URL: ', track_hash.stream_url)
+		playerWrapper.addToPlaylist(track_hash);
+  	}, function() {
+		console.log("Invalid URL");
+	});
 }
 
 
