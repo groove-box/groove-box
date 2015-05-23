@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "player": "^0.5.0"
+    "player": "^0.5.0",
+    "express": "^4.12.4"
   },
   "devDependencies": {},
   "scripts": {
@@ -22,9 +23,5 @@
   "bugs": {
     "url": "https://github.com/GrooveBoxHH/GrooveBox_Player/issues"
   },
-  "homepage": "https://github.com/GrooveBoxHH/GrooveBox_Player#readme",
-  "dependencies": {
-    "express": "^4.12.4"
-  },
-  "devDependencies": {}
+  "homepage": "https://github.com/GrooveBoxHH/GrooveBox_Player#readme"
 }
