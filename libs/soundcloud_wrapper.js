@@ -30,21 +30,26 @@ SoundcloudWrapper.prototype.init = function() {
   this.client = sc.client({access_token : this.access_token});
 }
 
-SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback) {
+SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback, error) {
   this.client.get('/resolve', { url: resolveUrl }, function(err, result) {
-    https.get(result.location, function(res) {
-      res.setEncoding('utf8');
-      var body = '';
-      res.on('data', function (chunk) {
-        body += chunk;
-      });
-      res.on('end', function () {
-        var song = JSON.parse(body);
-        request(song.stream_url + '?client_id=' + config.client_id, function (error, response, body) {
-          callback({ stream_url: response['request'].uri.href, track_data: song});
+    console.log("TEST: ",typeof result == "undefined");
+    if (typeof result == "undefined") {
+      error();
+    } else {
+      https.get(result.location, function(res) {
+        res.setEncoding('utf8');
+        var body = '';
+        res.on('data', function (chunk) {
+          body += chunk;
+        });
+        res.on('end', function () {
+          var song = JSON.parse(body);
+          request(song.stream_url + '?client_id=' + config.client_id, function (error, response, body) {
+            callback({ stream_url: response['request'].uri.href, track_data: song});
+          });
         });
       });
-    });
+    }
   });
 }
 

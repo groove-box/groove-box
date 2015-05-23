@@ -14,6 +14,8 @@ function urlReceivedCallback (url) {
     //Getting stream_url and track_data
     console.log("Added resolved URL: ", track_hash.stream_url)
     playerWrapper.addPlaylist(track_hash);
+  }, function() {
+    console.log("Invalid URL");
   });
 }
 
