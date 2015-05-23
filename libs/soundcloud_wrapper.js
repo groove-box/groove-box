@@ -39,8 +39,9 @@ SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback) {
         body += chunk;
       });
       res.on('end', function () {
-        request(JSON.parse(body).stream_url + '?client_id=' + config.client_id, function (error, response, body) {
-          callback(response['request'].uri.href);
+        var song = JSON.parse(body);
+        request(song.stream_url + '?client_id=' + config.client_id, function (error, response, body) {
+          callback({ stream_url: response['request'].uri.href, track_data: song});
         });
       });
     });

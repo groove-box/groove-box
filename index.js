@@ -10,9 +10,10 @@ sc.init();
 
 function urlReceivedCallback (url) {
  	console.log('Just received URL: \'', url, '\' for playback');
-  sc.resolve(url, function(mp3Url) {
-    console.log("Added resolved URL: ", mp3Url)
-    playerWrapper.add(mp3Url);
+  sc.resolve(url, function(track_hash) {
+    //Getting stream_url and track_data
+    console.log("Added resolved URL: ", track_hash.stream_url)
+    playerWrapper.addPlaylist(track_hash);
   });
 }
 
