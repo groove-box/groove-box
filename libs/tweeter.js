@@ -8,12 +8,11 @@ function Tweeter(tohost, topath, toport) {
   this.path = config.tweeter.path;
 }
 
-Tweeter.prototype.tweet = function (title, url) {
+Tweeter.prototype.tweet = function (status) {
 
   // Build the post string from an object
   var post_data = querystring.stringify({
-      'title' : "'" + title + "'",
-      'url': "'" + url + "'"
+      'status': status
   });
 
   // An object of options to indicate where to post to
@@ -23,22 +22,19 @@ Tweeter.prototype.tweet = function (title, url) {
       path: this.path,
       method: 'POST',
       headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': post_data.length
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': post_data.length
       }
   };
 
   // Set up the request
   var post_req = http.request(post_options, function(res) {
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-          console.log('Response from groovebox_tweeter: ' + chunk);
-      });
+    res.setEncoding('utf8');
+    res.on('data', function (chunk) {
+        console.log('Response from groovebox_tweeter: ' + chunk);
+    });
   });
 
-Tweeter.prototype.player_errorHandler = function(err) {
-        console.log(err);
-}
   // post the data
   post_req.write(post_data);
   post_req.end();
