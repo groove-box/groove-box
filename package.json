@@ -8,6 +8,7 @@
     "express": "^4.12.4",
     "multer": "^0.1.8",
     "player": "^0.5.0",
+    "request": "^2.55.0",
     "soundcloud-nodejs-api-wrapper": "git://github.com/monbro/soundcloud-nodejs-api-wrapper.git"
   },
   "devDependencies": {
