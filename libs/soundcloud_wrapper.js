@@ -1,6 +1,7 @@
 var https = require('https');
 SC = require('soundcloud-nodejs-api-wrapper');
 
+var request = require('request');
 var config = require('../config/config.json');
 var sc;
 var access_token;
@@ -38,10 +39,14 @@ SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback) {
         body += chunk;
       });
       res.on('end', function () {
-        callback(JSON.parse(body));
+        request(JSON.parse(body).stream_url + '?client_id=' + config.client_id, function (error, response, body) {
+          callback(response['request'].uri.href);
+        });
       });
     });
   });
 }
+
+
 
 module.exports = SoundcloudWrapper;
