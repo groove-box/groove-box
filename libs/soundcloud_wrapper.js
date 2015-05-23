@@ -33,8 +33,12 @@ SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback) {
   this.client.get('/resolve', { url: resolveUrl }, function(err, result) {
     https.get(result.location, function(res) {
       res.setEncoding('utf8');
+      var body = '';
       res.on('data', function (chunk) {
-        callback(chunk);
+        body += chunk;
+      });
+      res.on('end', function () {
+        callback(JSON.parse(body));
       });
     });
   });
