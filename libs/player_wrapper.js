@@ -18,6 +18,8 @@ PlayerWrapper.prototype.init = function() {
 	if (this.isInitialized()) {
 		return;
 	}
+	this.player_initialized = true;
+
 	// Initialize with empty playlist.
 	this.player = new Player([])
 	// Enable streaming.
