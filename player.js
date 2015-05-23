@@ -23,7 +23,7 @@ app.put('/play', function (req, res) {
  	console.log(req.body);
 	console.log('-------');
 
-	playURL(req.body.song);
+	playURL(req.body.url);
  
  	res.json(req.body);
 });
