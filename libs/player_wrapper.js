@@ -1,5 +1,5 @@
 var Player = require('player');
-var Tweeter = require('libs/Tweeter');
+var Tweeter = require('./tweeter');
 var player;
 
 function PlayerWrapper() {
