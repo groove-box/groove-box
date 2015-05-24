@@ -21,7 +21,7 @@ Tweeter.prototype.tweet = function (status, callback) {
         path: this.path,
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
             'Content-Length': post_data.length
         }
     };
@@ -47,6 +47,6 @@ Tweeter.prototype.tweet = function (status, callback) {
     // post the data
     post_req.write(post_data);
     post_req.end();
-}
+};
 
 module.exports = Tweeter;
