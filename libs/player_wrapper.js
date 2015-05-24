@@ -131,7 +131,7 @@ PlayerWrapper.prototype.addToPlaylist = function (data) {
 PlayerWrapper.prototype.outputPlaylist = function () {
     for (var i = 0; i < this.player._list.length; i++) {
         var cur = this.player._list[i];
-        console.log(i + '. ' + cur.track_data.title);
+        console.log(i + '. votes: ' + cur.votes + ' title:' + cur.track_data.title);
     }
 };
 
