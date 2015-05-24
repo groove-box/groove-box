@@ -8,8 +8,7 @@ function Tweeter(tohost, topath, toport) {
   this.path = config.tweeter.path;
 }
 
-Tweeter.prototype.tweet = function (status) {
-
+Tweeter.prototype.tweet = function (status, callback) {
   // Build the post string from an object
   var post_data = querystring.stringify({
       'status': status
@@ -28,12 +27,21 @@ Tweeter.prototype.tweet = function (status) {
   };
 
   // Set up the request
-  var post_req = http.request(post_options, function(res) {
-    res.setEncoding('utf8');
-    res.on('data', function (chunk) {
-        console.log('Response from groovebox_tweeter: ' + chunk);
+  var post_req = http
+    .request(post_options, function(res) {
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+          console.log('Response from groovebox_tweeter: ' + chunk);
+      });
+    })
+    .on('error', function(err) {
+      console.log('Tweeter error: ', err);
+    })
+    .on('close', function() {
+      if (callback) {
+        callback();
+      }
     });
-  });
 
   // post the data
   post_req.write(post_data);
