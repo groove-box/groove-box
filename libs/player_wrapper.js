@@ -1,5 +1,6 @@
 var Player = require('player');
 var Tweeter = require('./tweeter');
+var util = require('util');
 var player;
 
 function PlayerWrapper() {
@@ -36,7 +37,12 @@ PlayerWrapper.prototype.errorHandler = function(err) {
 }
 
 PlayerWrapper.prototype.playStartHandler = function(item) {
-	this.tweeter.tweet(item.track_data.title, item.track_data.permalink_url);
+	var status = util.format(
+		'Currently playing: %s. Check it out: %s',
+		item.track_data.title,
+		item.track_data.permalink_url
+	);
+	this.tweeter.tweet(status);
 }
 
 PlayerWrapper.prototype.playEndHandler = function(item) {

@@ -2,7 +2,8 @@
 var SoundcloudWrapper = require('./libs/soundcloud_wrapper');
 var PlayerWrapper = require('./libs/player_wrapper');
 var Server = require('./libs/server');
-
+var Tweeter = require('./libs/tweeter');
+var tweeter = new Tweeter();
 var soundcloudWrapper = new SoundcloudWrapper();
 var playerWrapper = new PlayerWrapper();
 soundcloudWrapper.init();
@@ -18,7 +19,21 @@ function urlReceivedCallback (url) {
 	});
 }
 
+function triggerStartTweet() {
+	tweeter.tweet('Starting to party now! Suggest songs now with our hashtags!');
+}
+
+function triggerEndTweet(callback) {
+	tweeter.tweet('Party is over! Go home. Be safe!', callback);
+}
+
 var myServer = new Server(1337);
 myServer.init(urlReceivedCallback);
 
-myServer.start();
+myServer.start(triggerStartTweet);
+
+process.on('SIGINT', function() {
+	triggerEndTweet(function() {
+		process.exit();
+	});
+});

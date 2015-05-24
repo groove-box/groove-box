@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 
 var bodyParser = require('body-parser');
-var multer = require('multer'); 
+var multer = require('multer');
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -40,7 +40,7 @@ Server.prototype.postHandler =  function(req, res) {
 	console.log('-------');
 
 	postCallback(req.body.url)
- 
+
  	res.json(req.body);
 }
 
@@ -48,12 +48,16 @@ app.get('/next', Server.prototype.nextHandler);
 app.get('/stop', Server.prototype.stopHandler);
 app.post('/play', Server.prototype.postHandler);
 
-Server.prototype.start = function() {
+Server.prototype.start = function(callback) {
 
 	var server = app.listen(this.port, function () {
 	  var port = server.address().port;
 
-	  console.log('Server running: http://localhost%s/play', port);
+	  console.log('Server running: http://localhost:%s/play', port);
+
+	  if (callback) {
+		callback();
+	  }
 
 	});
 }
