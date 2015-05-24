@@ -1,5 +1,6 @@
 var Player = require('player');
 var Tweeter = require('./tweeter');
+var SoundcloudWrapper = require('./soundcloud_wrapper');
 var util = require('util');
 var player;
 
@@ -10,6 +11,7 @@ function PlayerWrapper() {
 	this.playlistData = {};
 	this.history = [];
 	this.tweeter = new Tweeter();
+	this.soundcloudWrapper = new SoundcloudWrapper();
 }
 
 PlayerWrapper.prototype.init = function() {
@@ -30,6 +32,8 @@ PlayerWrapper.prototype.init = function() {
 		.on('playend', function() {
 			self.playEndHandler.apply(self, arguments);
 		});
+
+		this.player.next = function() {};
 }
 
 PlayerWrapper.prototype.errorHandler = function(err) {
@@ -48,24 +52,37 @@ PlayerWrapper.prototype.playStartHandler = function(item) {
 PlayerWrapper.prototype.playEndHandler = function(item) {
 	item.played++;
 	item.finished = true;
-
-	// Remove the entry here, because we do not want it to be in the playlist
-	// again. But since we are not adding the new sorted playlist yet, we do
-	// not need to remove the entry here.
-	this._removeEntryFromPlaylist(item);
-	// @TODO: Re-apply the list to the player.
+	this.playNextTrack();
 }
 
-PlayerWrapper.prototype.isInitialized = function () {
+PlayerWrapper.prototype.isInitialized = function() {
 	return this.player_initialized;
 }
 
-PlayerWrapper.prototype.isPlaying = function () {
-	var currentTrack = this.player.playing;
+PlayerWrapper.prototype.isPlaying = function() {
+	var currentTrack = this.getCurrentTrack();
 
 	var result = !!currentTrack && (currentTrack.finished === false);
 
 	return result;
+}
+
+PlayerWrapper.prototype.getCurrentTrack = function() {
+	var result = this.player.playing;
+
+	return result;
+}
+
+PlayerWrapper.prototype.getNextTrack = function() {
+	var nextTrackIndex = this.getNextTrackIndex();
+
+	var result = this.player._list[nextTrackIndex];
+
+	return result;
+}
+
+PlayerWrapper.prototype.getCurrentTrackIndex = function() {
+	return (this.getNextTrackIndex() - 1);
 }
 
 PlayerWrapper.prototype.getNextTrackIndex = function() {
@@ -77,14 +94,12 @@ PlayerWrapper.prototype.add = function(data) {
 		this.init();
 	}
 
+	var self = this;
+
 	this.player.add(data);
 
-	// @TODO: Fixme. If the player finished a file and is idle
-	// and a new song is pushed, this does either not trigger at
-	// and if plays the whole playlist again.
 	if (!this.isPlaying()) {
-		var nextTrackIndex = this.getNextTrackIndex();
-		this.player.play(nextTrackIndex);
+		this.playNextTrack()
 	}
 }
 
@@ -99,16 +114,64 @@ PlayerWrapper.prototype.addToPlaylist = function(data) {
 		playlistItem = this._generateNewPlaylistItem(data);
 	}
 	else {
-		// @TODO: Fixme. This is not working or it is not reaching here.
 		playlistItem.votes++;
 		playlistItem.finished = false;
 	}
 
-	this.add(playlistItem);
+	if (is_new_entry) {
+		this.add(playlistItem);
+	}
+	else {
+		this._sortPlaylistByVotes();
+	}
+}
 
-	this._sortPlaylistByVotes();
+PlayerWrapper.prototype.prepareNextTrack = function(callback) {
+	var nextTrack = this.getNextTrack();
 
-	// @TODO: Re-apply the list to the player.
+	this.prepareTrack(nextTrack, callback);
+}
+
+PlayerWrapper.prototype.prepareTrack = function(item, callback) {
+	var self = this;
+
+	if (item) {
+		this.soundcloudWrapper.resolveStreamUrl(item.track_data.stream_url, function(resolved_stream_url) {
+			item[self.player.options.src] = resolved_stream_url;
+
+			if (callback) {
+				callback.apply(self);
+			}
+		});
+	}
+	// @COMMENT: I guess this is bad, but currently it just works.
+	else if(callback) {
+		callback.apply(self);
+	}
+}
+
+PlayerWrapper.prototype.playNextTrack = function() {
+	this.prepareNextTrack(
+		function() {
+			this._playerNext();
+		}
+	);
+}
+
+PlayerWrapper.prototype._playerNext = function() {
+	var nextTrackIndex = this.getNextTrackIndex();
+	var player = (this._list) ? this : this.player;
+
+	if (nextTrackIndex >= player._list.length) {
+		player.emit('error', 'No next song was found');
+		player.emit('finish', player.playing);
+		return player;
+	}
+
+	player.stop();
+	player.play(nextTrackIndex);
+
+	return player;
 }
 
 PlayerWrapper.prototype.getPlaylistItem = function(data) {
@@ -116,7 +179,6 @@ PlayerWrapper.prototype.getPlaylistItem = function(data) {
 
 	for (var i = 0; i < this.player._list.length; i++) {
 		var cur = this.player._list[i];
-
 		if (cur.track_data.id === data.track_data.id) {
 			result = cur;
 			break;
@@ -129,37 +191,43 @@ PlayerWrapper.prototype.getPlaylistItem = function(data) {
 PlayerWrapper.prototype._generateNewPlaylistItem = function(data) {
 	var result = data;
 
-	result.votes = 1;
-	result.played = 0;
 	result.finished = false;
+	result.played = 0;
+	result.votes = 1;
 
 	return result;
 }
 
 PlayerWrapper.prototype._sortPlaylistByVotes = function() {
-	// @TODO: Fixme.
-	// this.playlist.sort(this._sortPlaylistByVotesCallback.apply(this));
+	var playlist = this.player._list;
+	if (playlist.length > 1) {
+		var nextTrackIndex = this.getNextTrackIndex();
+		// Get actual sortable part of the playlist.
+		var sortablePlaylistPart = playlist.slice(nextTrackIndex);
+
+		if (sortablePlaylistPart.length > 0) {
+			sortablePlaylistPart.sort(this._sortPlaylistByVotesCallback);
+
+			var parametersForSplice = sortablePlaylistPart;
+			parametersForSplice.unshift(nextTrackIndex, playlist.length);
+
+			Array.prototype.splice.apply(
+				playlist,
+				parametersForSplice
+			);
+		}
+	}
 }
 
 PlayerWrapper.prototype._sortPlaylistByVotesCallback = function(a, b) {
+	var result = 0;
 	// We are sorting descending here, so the numbers are reversed.
-	if (a_playlistData.votes > b_playlistData.votes) {
+	if (a.votes > b.votes) {
 		result = -1;
 	}
-	else if(a_playlistData.votes < b_playlistData.votes) {
+	else if(a.votes < b.votes) {
 		result = 1;
 	}
-
-	return result;
-}
-
-PlayerWrapper.prototype._removeEntryFromPlaylist = function(item) {
-	// @TODO: Fixme.
-	// this.playlist.filter(this._removeEntryFromPlaylistCallback, playlistData);
-}
-
-PlayerWrapper.prototype._removeEntryFromPlaylistCallback = function(index, value, targetArray) {
-	result = (this.stream_url !== value);
 
 	return result;
 }

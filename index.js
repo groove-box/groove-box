@@ -10,9 +10,9 @@ soundcloudWrapper.init();
 
 function urlReceivedCallback (url) {
 	console.log('Received URL:' , url);
-	soundcloudWrapper.resolve(url, function(track_hash) {
+	soundcloudWrapper.resolvePermaLinkUrl(url, function(track_hash) {
 		// Getting resolve stream url (src) and track_data.
-		console.log('Added resolved URL: ', track_hash.src)
+		console.log('Added SoundCloud Track: ', track_hash.track_data.id)
 		playerWrapper.addToPlaylist(track_hash);
   	}, function() {
 		console.log("Invalid URL");
