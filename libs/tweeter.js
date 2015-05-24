@@ -9,6 +9,8 @@ function Tweeter(tohost, topath, toport) {
 }
 
 Tweeter.prototype.tweet = function (status, callback) {
+    // Append timestamp hashtag.
+    status += ' #' + new Date().getTime();
     // Build the post string from an object
     var post_data = querystring.stringify({
         'status': status

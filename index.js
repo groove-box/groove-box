@@ -20,11 +20,11 @@ function urlReceivedCallback (url) {
 }
 
 function triggerStartTweet() {
-	tweeter.tweet('Starting to party now! Suggest songs now with our hashtags!');
+	tweeter.tweet('Starting to party now! Suggest songs now with our hashtags now!');
 }
 
 function triggerEndTweet(callback) {
-	tweeter.tweet('Party is over! Go home. Be safe!', callback);
+	tweeter.tweet('Party is over! Go home. Be safe! DDaD!', callback);
 }
 
 var myServer = new Server(1337);
