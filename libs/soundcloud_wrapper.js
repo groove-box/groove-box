@@ -11,9 +11,15 @@ function SoundcloudWrapper() {
   this.sc = null;
   this.access_token = null;
   this.client = null;
+  this.initialized = false;
 }
 
 SoundcloudWrapper.prototype.init = function() {
+  if (this.isInitialized()) {
+    return;
+  }
+  this.initialized = true;
+
   var sc = new SC({
     client_id :     config.credentials.client_id,
     client_secret : config.credentials.client_secret,
@@ -30,9 +36,16 @@ SoundcloudWrapper.prototype.init = function() {
   this.client = sc.client({access_token : this.access_token});
 }
 
-SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback, error) {
+SoundcloudWrapper.prototype.isInitialized = function() {
+  return this.initialized;
+}
+
+SoundcloudWrapper.prototype.resolvePermaLinkUrl = function(resolveUrl, callback, error) {
+  if (!this.isInitialized) {
+    this.init();
+  }
+
   this.client.get('/resolve', { url: resolveUrl }, function(err, result) {
-    console.log("TEST: ",typeof result == "undefined");
     if (typeof result == "undefined") {
       error();
     } else {
@@ -44,18 +57,30 @@ SoundcloudWrapper.prototype.resolve = function(resolveUrl, callback, error) {
         });
         res.on('end', function () {
           var song = JSON.parse(body);
-          request(song.stream_url + '?client_id=' + config.credentials.client_id, function (error, response, body) {
+          if (callback) {
             callback({
-              src: response['request'].uri.href,
               track_data: song
             });
-          });
+          }
         });
       });
     }
   });
 }
 
+SoundcloudWrapper.prototype.resolveStreamUrl = function(stream_url, callback) {
+  if (!this.isInitialized) {
+    this.init();
+  }
 
+  if (stream_url) {
+    var stream_url_to_query = stream_url + '?client_id=' + config.credentials.client_id;
+    request(stream_url_to_query, function (error, response, body) {
+      if (callback) {
+        callback(response['request'].uri.href);
+      }
+    });
+  }
+}
 
 module.exports = SoundcloudWrapper;
