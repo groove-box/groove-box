@@ -36,6 +36,7 @@ Tweeter.prototype.tweet = function (status, callback) {
     })
     .on('error', function(err) {
       console.log('Tweeter error: ', err);
+      console.log('Initial status: ', status);
     })
     .on('close', function() {
       if (callback) {
