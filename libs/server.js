@@ -10,27 +10,30 @@ app.use(multer()); // for parsing multipart/form-data
 
 var postCallback = null;
 var nextCallback = null;
+var dumpCallback = null;
 var stopCallback = null;
 
 function Server(runPort) {
 	this.port = runPort;
 }
 
-Server.prototype.init = function(urlCallback, nextReceivedCallback, stopReceivedCallback) {
+Server.prototype.init = function(urlCallback, nextReceivedCallback, stopReceivedCallback, dumpReceivedCallback) {
 
 	postCallback = urlCallback;
 	nextCallback = nextReceivedCallback;
 	stopCallback = stopReceivedCallback;
+	dumpCallback = dumpReceivedCallback;
 }
 
 Server.prototype.nextHandler =  function(req, res) {
 
 	nextCallback();
+	res.end();
 }
 
 Server.prototype.stopHandler =  function(req, res) {
-
 	stopCallback();
+	res.end();
 }
 
 Server.prototype.postHandler =  function(req, res) {
@@ -44,8 +47,15 @@ Server.prototype.postHandler =  function(req, res) {
  	res.json(req.body);
 }
 
+Server.prototype.dumpHandler =  function(req, res) {
+	var result = dumpCallback();
+
+	res.json(result);
+}
+
 app.get('/next', Server.prototype.nextHandler);
 app.get('/stop', Server.prototype.stopHandler);
+app.get('/dump', Server.prototype.dumpHandler);
 app.post('/play', Server.prototype.postHandler);
 
 Server.prototype.start = function(callback) {
@@ -63,7 +73,7 @@ Server.prototype.start = function(callback) {
 }
 
 Server.prototype.player_errorHandler = function(err) {
-        console.log(err);
+	console.log(err);
 }
 
 

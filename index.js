@@ -28,7 +28,21 @@ function triggerEndTweet(callback) {
 }
 
 var myServer = new Server(1337);
-myServer.init(urlReceivedCallback);
+myServer.init(
+	urlReceivedCallback,
+	function() {
+		playerWrapper.next();
+	},
+	function() {
+		playerWrapper.stop();
+	},
+	function() {
+		// echo body to client
+		var playerWrapperDump = playerWrapper.dump();
+
+		return playerWrapperDump;
+	}
+);
 
 myServer.start(triggerStartTweet);
 

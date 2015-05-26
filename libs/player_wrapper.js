@@ -95,6 +95,36 @@ PlayerWrapper.prototype.getNextTrackIndex = function () {
     return this.player.history.length;
 };
 
+PlayerWrapper.prototype.next = function () {
+	this.init();
+
+	var wasPlaying = this.isPlaying();
+
+    this.stop();
+
+    // Only call this if the player is not running. We have the 'playend'
+    // handler for triggering next tracks.
+    if (!wasPlaying) {
+		this.playNextTrack();
+    }
+};
+
+PlayerWrapper.prototype.stop = function () {
+	this.init();
+
+    if (this.isPlaying()) {
+        this.player.stop();
+    }
+}
+
+PlayerWrapper.prototype.play = function () {
+	this.init();
+
+    if (!this.isPlaying()) {
+        this.player.play();
+    }
+}
+
 PlayerWrapper.prototype.add = function (data) {
     if (!this.isInitialized()) {
         this.init();
@@ -246,10 +276,13 @@ PlayerWrapper.prototype._sortPlaylistByVotesCallback = function (a, b) {
     return result;
 };
 
+PlayerWrapper.prototype.dump = function () {
+    return this;
+};
+
 PlayerWrapper.prototype.savePlaylist = function () {
-    if (!this.isInitialized()) {
-        return;
-    }
+    this.init();
+
     fs.writeFileSync(config.playerWrapper.playlistLocation, JSON.stringify(this.player._list));
 };
 
