@@ -42,6 +42,7 @@ PlayerWrapper.prototype.init = function () {
 };
 
 PlayerWrapper.prototype.errorHandler = function (err) {
+    this.stop();
     console.log(err);
 };
 
