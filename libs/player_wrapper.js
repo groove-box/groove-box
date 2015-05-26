@@ -2,6 +2,8 @@ var Player = require('player');
 var Tweeter = require('./tweeter');
 var SoundcloudWrapper = require('./soundcloud_wrapper');
 var util = require('util');
+var fs = require('fs');
+var config = require('../config/config');
 var player;
 
 function PlayerWrapper() {
@@ -35,6 +37,8 @@ PlayerWrapper.prototype.init = function () {
 
     this.player.next = function () {
     };
+
+    this.loadPlaylist();
 };
 
 PlayerWrapper.prototype.errorHandler = function (err) {
@@ -131,7 +135,7 @@ PlayerWrapper.prototype.addToPlaylist = function (data) {
 PlayerWrapper.prototype.outputPlaylist = function () {
     for (var i = 0; i < this.player._list.length; i++) {
         var cur = this.player._list[i];
-        console.log(i + '. votes: ' + cur.votes + ' title: ' + cur.track_data.title);
+        console.log((i + 1) + '. votes: ' + cur.votes + ' title: ' + cur.track_data.title);
     }
 };
 
@@ -144,7 +148,7 @@ PlayerWrapper.prototype.prepareNextTrack = function (callback) {
 PlayerWrapper.prototype.prepareTrack = function (item, callback) {
     var self = this;
 
-    if (item) {
+    if (item && item.track_data.streamable) {
         this.soundcloudWrapper.resolveStreamUrl(item.track_data.stream_url, function (resolved_stream_url) {
             item[self.player.options.src] = resolved_stream_url;
 
@@ -239,6 +243,33 @@ PlayerWrapper.prototype._sortPlaylistByVotesCallback = function (a, b) {
     }
 
     return result;
+};
+
+PlayerWrapper.prototype.savePlaylist = function () {
+    if (!this.isInitialized()) {
+        return;
+    }
+    fs.writeFileSync(config.playerWrapper.playlistLocation, JSON.stringify(this.player._list));
+};
+
+PlayerWrapper.prototype.loadPlaylist = function () {
+    var fileContent = fs.readFileSync(config.playerWrapper.playlistLocation);
+
+    if (fileContent) {
+        var playlist = JSON.parse(fileContent);
+
+        if (playlist) {
+            for (var i in playlist) {
+                var cur = playlist[i];
+
+                if (cur[this.player.options.src]) {
+                    delete cur[this.player.options.src];
+                }
+            }
+
+            this.player._list = playlist;
+        }
+    }
 };
 
 module.exports = PlayerWrapper;

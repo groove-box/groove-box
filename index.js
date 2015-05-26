@@ -34,6 +34,7 @@ myServer.start(triggerStartTweet);
 
 process.on('SIGINT', function() {
 	triggerEndTweet(function() {
+		playerWrapper.savePlaylist();
 		process.exit();
 	});
 });

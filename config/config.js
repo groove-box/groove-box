@@ -5,6 +5,9 @@ var config = {
 		host: '127.0.0.1',
 		port: 3000,
 		path: '/tweet'
+	},
+	playerWrapper: {
+		playlistLocation: __dirname + '/../playlist.dump.json'
 	}
 };
 
