@@ -40,10 +40,10 @@ Tweeter.prototype.tweet = function (status, callback) {
                 console.log('Tweeter error: ', err);
                 console.log('Initial status: ', status);
             })
-            .on('close', function () {
-                if (callback) {
-                    callback();
-                }
+            .on('finish', function () {
+              if (callback) {
+                  callback();
+              }
             });
 
     // post the data
