@@ -7,9 +7,10 @@ Install
 ----------------
 
 1. Clone this Repo and the GrooveBox_Tweeter repo.
-2. Edit the config/credentials.json for your SoundCloud login and app tokens.
-3. Do all Steps from the GrooveBox_Tweeter repo install.
-4. Start the GrooveBox_Player with:
+2. Run: npm install
+3. Edit the config/credentials.json for your SoundCloud login and app tokens.
+4. Do all Steps from the GrooveBox_Tweeter repo install.
+5. Start the GrooveBox_Player with:
 
   node index.js
 
