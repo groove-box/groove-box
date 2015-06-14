@@ -1,7 +1,7 @@
 var path = require('path');
 
 var config = {
-    playerWrapper: {
+    playerService: {
         playlistLocation: path.join(__dirname, 'playlist.dump.json')
     },
     credentials: require(path.join(__dirname, 'credentials.json'))

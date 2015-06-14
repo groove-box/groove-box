@@ -2,15 +2,15 @@ var https = require('https');
 var path = require('path');
 var SoundCloud = require('soundcloud-nodejs-api-wrapper');
 var request = require('request');
-var config = require(path.join(__dirname, '..', 'config', 'config.js'));
+var config = require(path.join(__dirname, '..', '..', 'config', 'config.js'));
 
-function SoundcloudWrapper() {
+function SoundcloudService() {
     this.access_token = null;
     this.client = null;
     this.initialized = false;
 }
 
-SoundcloudWrapper.prototype.init = function () {
+SoundcloudService.prototype.init = function () {
     if (this.isInitialized()) {
         return;
     }
@@ -32,11 +32,11 @@ SoundcloudWrapper.prototype.init = function () {
     this.client = sc.client({access_token: this.access_token});
 };
 
-SoundcloudWrapper.prototype.isInitialized = function () {
+SoundcloudService.prototype.isInitialized = function () {
     return this.initialized;
 };
 
-SoundcloudWrapper.prototype.resolvePermaLinkUrl = function (resolveUrl, callback, error) {
+SoundcloudService.prototype.resolvePermaLinkUrl = function (resolveUrl, callback, error) {
     if (!this.isInitialized) {
         this.init();
     }
@@ -64,7 +64,7 @@ SoundcloudWrapper.prototype.resolvePermaLinkUrl = function (resolveUrl, callback
     });
 };
 
-SoundcloudWrapper.prototype.resolveStreamUrl = function (stream_url, callback) {
+SoundcloudService.prototype.resolveStreamUrl = function (stream_url, callback) {
     if (!this.isInitialized) {
         this.init();
     }
@@ -79,4 +79,4 @@ SoundcloudWrapper.prototype.resolveStreamUrl = function (stream_url, callback) {
     }
 };
 
-module.exports = SoundcloudWrapper;
+module.exports = SoundcloudService;

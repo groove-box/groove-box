@@ -1,10 +1,10 @@
 var path = require('path');
-var libPath = path.join(__dirname, '..', '..', 'lib');
-var SoundcloudWrapper = require(path.join(libPath, 'soundcloud_wrapper'));
-var PlayerWrapper = require(path.join(libPath, 'player_wrapper'));
-var soundcloudWrapper = new SoundcloudWrapper();
-soundcloudWrapper.init();
-var playerWrapper = new PlayerWrapper();
+var servicesPath = path.join(__dirname, '..', 'services');
+var SoundcloudService = require(path.join(servicesPath, 'soundcloudService'));
+var PlayerService = require(path.join(servicesPath, 'playerService'));
+var soundcloudService = new SoundcloudService();
+soundcloudService.init();
+var playerService = new PlayerService();
 
 module.exports = (function () {
     'use strict';
@@ -13,9 +13,9 @@ module.exports = (function () {
         console.log(req.body);
         console.log('-------');
         console.log('Received URL:', req.body.url);
-        soundcloudWrapper.resolvePermaLinkUrl(req.body.url, function (track_hash) {
+        soundcloudService.resolvePermaLinkUrl(req.body.url, function (track_hash) {
             console.log('Added SoundCloud Track: ', track_hash.track_data.id);
-            playerWrapper.addToPlaylist(track_hash);
+            playerService.addToPlaylist(track_hash);
         }, function () {
             console.log("Invalid URL");
         });
@@ -23,17 +23,17 @@ module.exports = (function () {
     }
 
     function stop(req, res, next) {
-        playerWrapper.stop();
+        playerService.stop();
         res.end();
     }
 
     function next(req, res, next) {
-        playerWrapper.next();
+        playerService.next();
         res.end();
     }
 
     function dump(req, res, next) {
-        res.json(playerWrapper.dump());
+        res.json(playerService.dump());
     }
 
     return {

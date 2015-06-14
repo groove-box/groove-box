@@ -10,9 +10,9 @@ module.exports = (function () {
                         console.log('Initial tweet: ', tweet);
                     } else {
                         console.log('Tweeted: ' + tweet);
-                        if (callback) {
-                            callback();
-                        }
+                    }
+                    if (callback) {
+                        callback();
                     }
                 });
     }

@@ -1,21 +1,21 @@
 var path = require('path');
 var Player = require('player');
-var twitterService = require(path.join(__dirname, '..', 'server', 'services', 'twitterService'));
-var SoundcloudWrapper = require(path.join(__dirname, 'soundcloud_wrapper'));
+var twitterService = require(path.join(__dirname, 'twitterService'));
+var soundcloudService = require(path.join(__dirname, 'soundcloudService'));
 var util = require('util');
 var fs = require('fs');
-var config = require(path.join(__dirname, '..', 'config', 'config.js'));
+var config = require(path.join(__dirname, '..', '..', 'config', 'config.js'));
 
-function PlayerWrapper() {
+function PlayerService() {
     this.player_initialized = false;
     this.player = null;
     this.playlist = [];
     this.history = [];
     this.twitterService = twitterService;
-    this.soundcloudWrapper = new SoundcloudWrapper();
+    this.soundcloudService = new soundcloudService();
 }
 
-PlayerWrapper.prototype.init = function () {
+PlayerService.prototype.init = function () {
     if (this.isInitialized()) {
         return;
     }
@@ -40,12 +40,12 @@ PlayerWrapper.prototype.init = function () {
     //this.loadPlaylist();
 };
 
-PlayerWrapper.prototype.errorHandler = function (err) {
+PlayerService.prototype.errorHandler = function (err) {
     this.stop();
     console.log(err);
 };
 
-PlayerWrapper.prototype.playStartHandler = function (item) {
+PlayerService.prototype.playStartHandler = function (item) {
     var status = util.format(
             'Currently playing: %s. Check it out: %s',
             item.track_data.title,
@@ -54,17 +54,17 @@ PlayerWrapper.prototype.playStartHandler = function (item) {
     this.twitterService.tweet(status);
 };
 
-PlayerWrapper.prototype.playEndHandler = function (item) {
+PlayerService.prototype.playEndHandler = function (item) {
     item.played++;
     item.finished = true;
     this.playNextTrack();
 };
 
-PlayerWrapper.prototype.isInitialized = function () {
+PlayerService.prototype.isInitialized = function () {
     return this.player_initialized;
 };
 
-PlayerWrapper.prototype.isPlaying = function () {
+PlayerService.prototype.isPlaying = function () {
     var currentTrack = this.getCurrentTrack();
 
     var result = !!currentTrack && (currentTrack.finished === false);
@@ -72,13 +72,13 @@ PlayerWrapper.prototype.isPlaying = function () {
     return result;
 };
 
-PlayerWrapper.prototype.getCurrentTrack = function () {
+PlayerService.prototype.getCurrentTrack = function () {
     var result = this.player.playing;
 
     return result;
 };
 
-PlayerWrapper.prototype.getNextTrack = function () {
+PlayerService.prototype.getNextTrack = function () {
     var nextTrackIndex = this.getNextTrackIndex();
 
     var result = this.player._list[nextTrackIndex];
@@ -86,15 +86,15 @@ PlayerWrapper.prototype.getNextTrack = function () {
     return result;
 };
 
-PlayerWrapper.prototype.getCurrentTrackIndex = function () {
+PlayerService.prototype.getCurrentTrackIndex = function () {
     return (this.getNextTrackIndex() - 1);
 };
 
-PlayerWrapper.prototype.getNextTrackIndex = function () {
+PlayerService.prototype.getNextTrackIndex = function () {
     return this.player.history.length;
 };
 
-PlayerWrapper.prototype.next = function () {
+PlayerService.prototype.next = function () {
     this.init();
 
     var wasPlaying = this.isPlaying();
@@ -108,7 +108,7 @@ PlayerWrapper.prototype.next = function () {
     }
 };
 
-PlayerWrapper.prototype.stop = function () {
+PlayerService.prototype.stop = function () {
     this.init();
 
     if (this.isPlaying()) {
@@ -116,7 +116,7 @@ PlayerWrapper.prototype.stop = function () {
     }
 };
 
-PlayerWrapper.prototype.play = function () {
+PlayerService.prototype.play = function () {
     this.init();
 
     if (!this.isPlaying()) {
@@ -124,7 +124,7 @@ PlayerWrapper.prototype.play = function () {
     }
 };
 
-PlayerWrapper.prototype.add = function (data) {
+PlayerService.prototype.add = function (data) {
     if (!this.isInitialized()) {
         this.init();
     }
@@ -138,7 +138,7 @@ PlayerWrapper.prototype.add = function (data) {
     }
 };
 
-PlayerWrapper.prototype.addToPlaylist = function (data) {
+PlayerService.prototype.addToPlaylist = function (data) {
     if (!this.isInitialized()) {
         this.init();
     }
@@ -162,24 +162,24 @@ PlayerWrapper.prototype.addToPlaylist = function (data) {
     this.outputPlaylist();
 };
 
-PlayerWrapper.prototype.outputPlaylist = function () {
+PlayerService.prototype.outputPlaylist = function () {
     for (var i = 0; i < this.player._list.length; i++) {
         var cur = this.player._list[i];
         console.log((i + 1) + '. votes: ' + cur.votes + ' title: ' + cur.track_data.title);
     }
 };
 
-PlayerWrapper.prototype.prepareNextTrack = function (callback) {
+PlayerService.prototype.prepareNextTrack = function (callback) {
     var nextTrack = this.getNextTrack();
 
     this.prepareTrack(nextTrack, callback);
 };
 
-PlayerWrapper.prototype.prepareTrack = function (item, callback) {
+PlayerService.prototype.prepareTrack = function (item, callback) {
     var self = this;
 
     if (item && item.track_data.streamable) {
-        this.soundcloudWrapper.resolveStreamUrl(item.track_data.stream_url, function (resolved_stream_url) {
+        this.soundcloudService.resolveStreamUrl(item.track_data.stream_url, function (resolved_stream_url) {
             item[self.player.options.src] = resolved_stream_url;
 
             if (callback) {
@@ -193,7 +193,7 @@ PlayerWrapper.prototype.prepareTrack = function (item, callback) {
     }
 };
 
-PlayerWrapper.prototype.playNextTrack = function () {
+PlayerService.prototype.playNextTrack = function () {
     this.prepareNextTrack(
             function () {
                 this._playerNext();
@@ -201,7 +201,7 @@ PlayerWrapper.prototype.playNextTrack = function () {
     );
 };
 
-PlayerWrapper.prototype._playerNext = function () {
+PlayerService.prototype._playerNext = function () {
     var nextTrackIndex = this.getNextTrackIndex();
     var player = (this._list) ? this : this.player;
 
@@ -217,7 +217,7 @@ PlayerWrapper.prototype._playerNext = function () {
     return player;
 };
 
-PlayerWrapper.prototype.getPlaylistItem = function (data) {
+PlayerService.prototype.getPlaylistItem = function (data) {
     var result;
 
     for (var i = 0; i < this.player._list.length; i++) {
@@ -231,7 +231,7 @@ PlayerWrapper.prototype.getPlaylistItem = function (data) {
     return result;
 };
 
-PlayerWrapper.prototype._generateNewPlaylistItem = function (data) {
+PlayerService.prototype._generateNewPlaylistItem = function (data) {
     var result = data;
 
     result.finished = false;
@@ -241,7 +241,7 @@ PlayerWrapper.prototype._generateNewPlaylistItem = function (data) {
     return result;
 };
 
-PlayerWrapper.prototype._sortPlaylistByVotes = function () {
+PlayerService.prototype._sortPlaylistByVotes = function () {
     var playlist = this.player._list;
     if (playlist.length > 1) {
         var nextTrackIndex = this.getNextTrackIndex();
@@ -262,7 +262,7 @@ PlayerWrapper.prototype._sortPlaylistByVotes = function () {
     }
 };
 
-PlayerWrapper.prototype._sortPlaylistByVotesCallback = function (a, b) {
+PlayerService.prototype._sortPlaylistByVotesCallback = function (a, b) {
     var result = 0;
     // We are sorting descending here, so the numbers are reversed.
     if (a.votes > b.votes) {
@@ -275,18 +275,18 @@ PlayerWrapper.prototype._sortPlaylistByVotesCallback = function (a, b) {
     return result;
 };
 
-PlayerWrapper.prototype.dump = function () {
+PlayerService.prototype.dump = function () {
     return this;
 };
 
-PlayerWrapper.prototype.savePlaylist = function () {
+PlayerService.prototype.savePlaylist = function () {
     this.init();
 
-    fs.writeFileSync(config.playerWrapper.playlistLocation, JSON.stringify(this.player._list));
+    fs.writeFileSync(config.playerService.playlistLocation, JSON.stringify(this.player._list));
 };
 
-PlayerWrapper.prototype.loadPlaylist = function () {
-    var fileContent = fs.readFileSync(config.playerWrapper.playlistLocation);
+PlayerService.prototype.loadPlaylist = function () {
+    var fileContent = fs.readFileSync(config.playerService.playlistLocation);
 
     if (fileContent) {
         var playlist = JSON.parse(fileContent);
@@ -305,4 +305,4 @@ PlayerWrapper.prototype.loadPlaylist = function () {
     }
 };
 
-module.exports = PlayerWrapper;
+module.exports = PlayerService;
