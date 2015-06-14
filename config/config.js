@@ -1,16 +1,10 @@
-var credentials = require('./credentials.json');
+var path = require('path');
 
 var config = {
-	tweeter: {
-		host: '127.0.0.1',
-		port: 3000,
-		path: '/tweet'
-	},
-	playerWrapper: {
-		playlistLocation: __dirname + '/../playlist.dump.json'
-	}
+    playerWrapper: {
+        playlistLocation: path.join(__dirname, 'playlist.dump.json')
+    },
+    credentials: require(path.join(__dirname, 'credentials.json'))
 };
-
-config.credentials = credentials;
 
 module.exports = config;

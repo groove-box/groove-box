@@ -1,33 +1,25 @@
 {
   "name": "GrooveBox_Player",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
-  "dependencies": {
-    "body-parser": "^1.12.4",
-    "express": "^4.12.4",
-    "multer": "^0.1.8",
-    "player": "^0.5.0",
-    "request": "^2.55.0",
-    "soundcloud-nodejs-api-wrapper": "git://github.com/monbro/soundcloud-nodejs-api-wrapper.git"
-  },
-  "devDependencies": {
-    "debug": "^2.2.0"
-  },
+  "private": true,
+  "author": "",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "latest",
+    "compression": "latest",
+    "consolidate": "latest",
+    "debug": "latest",
+    "express": "latest",
+    "player": "latest",
+    "request": "latest",
+    "soundcloud-nodejs-api-wrapper": "git://github.com/monbro/soundcloud-nodejs-api-wrapper.git",
+    "swig": "latest"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/GrooveBoxHH/GrooveBox_Player.git"
-  },
-  "keywords": [
-    "awesomeness"
-  ],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/GrooveBoxHH/GrooveBox_Player/issues"
-  },
-  "homepage": "https://github.com/GrooveBoxHH/GrooveBox_Player#readme"
+  }
 }
