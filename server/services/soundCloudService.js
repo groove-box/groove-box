@@ -1,10 +1,10 @@
 var soundCloudApiWrapper = require('soundcloud-nodejs-api-wrapper');
-var config = require(require('path').join(__dirname, '..', '..', 'config', 'config.js'));
+var credentials = require(require('path').join(__dirname, '..', '..', 'config', 'credentials.json'));
 var soundCloudClientFactory = new soundCloudApiWrapper({
-    client_id: config.credentials.clientId,
-    client_secret: config.credentials.clientSecret,
-    username: config.credentials.username,
-    password: config.credentials.password
+    client_id: credentials.clientId,
+    client_secret: credentials.clientSecret,
+    username: credentials.username,
+    password: credentials.password
 });
 var request = require('request');
 

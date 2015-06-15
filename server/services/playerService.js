@@ -2,12 +2,10 @@ var path = require('path');
 var Player = require('player');
 var twitterService = require(path.join(__dirname, 'twitterService'));
 var util = require('util');
-var config = require(path.join(__dirname, '..', '..', 'config', 'config.js'));
 
 function PlayerService() {
     this.playerInitialized = false;
     this.player = null;
-    this.playlist = [];
     this.history = [];
     this.twitterService = twitterService;
     this.soundCloudService = require(path.join(__dirname, 'soundCloudService'));
@@ -255,10 +253,6 @@ PlayerService.prototype._sortPlaylistByVotesCallback = function (a, b) {
     }
 
     return result;
-};
-
-PlayerService.prototype.dump = function () {
-    return this;
 };
 
 module.exports = PlayerService;

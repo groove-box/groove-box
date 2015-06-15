@@ -7,7 +7,7 @@ var playerService = new PlayerService();
 module.exports = (function () {
     'use strict';
 
-    function play(req, res, next) {
+    function play(req, res) {
         console.log(req.body);
         console.log('-------');
         console.log('Received URL:', req.body.url);
@@ -17,7 +17,7 @@ module.exports = (function () {
         }, function () {
             console.log("Invalid URL");
         });
-        res.json(req.body);
+        res.end();
     }
 
     function stop(req, res) {
@@ -30,14 +30,9 @@ module.exports = (function () {
         res.end();
     }
 
-    function dump(req, res) {
-        res.json(playerService.dump());
-    }
-
     return {
         play: play,
         stop: stop,
-        next: next,
-        dump: dump
+        next: next
     };
 })();
