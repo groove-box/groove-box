@@ -12,7 +12,7 @@ module.exports = (function () {
     'use strict';
 
     function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, successCallback, errorCallback) {
-        request.get(resolvedPermaLinkUrl.location, function (err, response, body) {
+        request.get(resolvedPermaLinkUrl, function (err, response, body) {
             if (err) {
                 errorCallback();
             } else {
@@ -22,11 +22,11 @@ module.exports = (function () {
     }
 
     function getSong(permaLinkUrl, successCallback, errorCallback) {
-        soundCloudClientFactory.client().get('/resolve', {url: permaLinkUrl}, function (err, resolvedPermaLinkUrl) {
+        soundCloudClientFactory.client().get('/resolve', {url: permaLinkUrl}, function (err, resolvedPermaLink) {
             if (err) {
                 errorCallback();
             } else {
-                getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, successCallback, errorCallback)
+                getSongFromResolvedPermaLinkUrl(resolvedPermaLink.location, successCallback, errorCallback)
             }
         });
     }
