@@ -31,14 +31,14 @@ module.exports = (function () {
         });
     }
 
-    function resolveStreamUrl(streamUrl, callback) {
-        request.get(streamUrl + '?client_id=' + credentials.clientId, function (err, response) {
+    function getStreamUrl(unresolvedStreamUrl, callback) {
+        request.get(unresolvedStreamUrl + '?client_id=' + credentials.clientId, function (err, response) {
             callback(response.request.uri.href);
         });
     }
 
     return {
         getSong: getSong,
-        resolveStreamUrl: resolveStreamUrl
+        getStreamUrl: getStreamUrl
     }
 })();

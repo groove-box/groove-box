@@ -159,8 +159,8 @@ PlayerService.prototype.prepareTrack = function (song, callback) {
     var self = this;
 
     if (song && song.streamable) {
-        this.soundCloudService.resolveStreamUrl(song.stream_url, function (resolved_stream_url) {
-            song[self.player.options.src] = resolved_stream_url;
+        this.soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
+            song[self.player.options.src] = streamUrl;
 
             if (callback) {
                 callback.apply(self);
