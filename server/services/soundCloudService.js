@@ -12,11 +12,11 @@ module.exports = (function () {
     'use strict';
 
     function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, successCallback, errorCallback) {
-        request.get(resolvedPermaLinkUrl, function (err, response, body) {
+        request.get(resolvedPermaLinkUrl, function (err, response, song) {
             if (err) {
                 errorCallback();
             } else {
-                successCallback(JSON.parse(body));
+                successCallback(JSON.parse(song));
             }
         });
     }
