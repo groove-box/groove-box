@@ -11,7 +11,7 @@ var request = require('request');
 module.exports = (function () {
     'use strict';
 
-    function resolvePermaLinkUrl(permaLinkUrl, successCallback, errorCallback) {
+    function getSong(permaLinkUrl, successCallback, errorCallback) {
         soundCloudClientFactory.client().get('/resolve', {url: permaLinkUrl}, function (err, tempLink) {
             if (err) {
                 errorCallback();
@@ -20,9 +20,7 @@ module.exports = (function () {
                     if (error) {
                         errorCallback();
                     } else {
-                        successCallback({
-                            trackData: JSON.parse(body)
-                        });
+                        successCallback(JSON.parse(body));
                     }
                 });
             }
@@ -30,13 +28,13 @@ module.exports = (function () {
     }
 
     function resolveStreamUrl(streamUrl, callback) {
-        request.get(streamUrl + '?client_id=' + config.credentials.clientId, function (error, response) {
+        request.get(streamUrl + '?client_id=' + credentials.clientId, function (error, response) {
             callback(response.request.uri.href);
         });
     }
 
     return {
-        resolvePermaLinkUrl: resolvePermaLinkUrl,
+        getSong: getSong,
         resolveStreamUrl: resolveStreamUrl
     }
 })();

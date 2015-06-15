@@ -11,9 +11,9 @@ module.exports = (function () {
         console.log(req.body);
         console.log('-------');
         console.log('Received URL:', req.body.url);
-        soundCloudService.resolvePermaLinkUrl(req.body.url, function (trackHash) {
-            console.log('Added SoundCloud Track: ', trackHash.trackData.id);
-            playerService.addToPlaylist(trackHash);
+        soundCloudService.getSong(req.body.url, function (song) {
+            console.log('Added SoundCloud Track: ', song.id);
+            playerService.addToPlaylist(song);
         }, function () {
             console.log("Invalid URL");
         });

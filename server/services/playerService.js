@@ -39,11 +39,11 @@ PlayerService.prototype.errorHandler = function (err) {
     console.log(err);
 };
 
-PlayerService.prototype.playStartHandler = function (item) {
+PlayerService.prototype.playStartHandler = function (song) {
     var status = util.format(
             'Currently playing: %s. Check it out: %s',
-            item.trackData.title,
-            item.trackData.permalink_url
+            song.title,
+            song.permalink_url
     );
     this.twitterService.tweet(status);
 };
@@ -144,8 +144,8 @@ PlayerService.prototype.addToPlaylist = function (data) {
 
 PlayerService.prototype.outputPlaylist = function () {
     for (var i = 0; i < this.player._list.length; i++) {
-        var cur = this.player._list[i];
-        console.log((i + 1) + '. votes: ' + cur.votes + ' title: ' + cur.trackData.title);
+        var currentSong = this.player._list[i];
+        console.log((i + 1) + '. votes: ' + currentSong.votes + ' title: ' + currentSong.title);
     }
 };
 
@@ -155,12 +155,12 @@ PlayerService.prototype.prepareNextTrack = function (callback) {
     this.prepareTrack(nextTrack, callback);
 };
 
-PlayerService.prototype.prepareTrack = function (item, callback) {
+PlayerService.prototype.prepareTrack = function (song, callback) {
     var self = this;
 
-    if (item && item.trackData.streamable) {
-        this.soundCloudService.resolveStreamUrl(item.trackData.stream_url, function (resolved_stream_url) {
-            item[self.player.options.src] = resolved_stream_url;
+    if (song && song.streamable) {
+        this.soundCloudService.resolveStreamUrl(song.stream_url, function (resolved_stream_url) {
+            song[self.player.options.src] = resolved_stream_url;
 
             if (callback) {
                 callback.apply(self);
@@ -197,13 +197,13 @@ PlayerService.prototype._playerNext = function () {
     return player;
 };
 
-PlayerService.prototype.getPlaylistItem = function (data) {
+PlayerService.prototype.getPlaylistItem = function (nextSong) {
     var result;
 
     for (var i = 0; i < this.player._list.length; i++) {
-        var cur = this.player._list[i];
-        if (cur.trackData.id === data.trackData.id) {
-            result = cur;
+        var currentSong = this.player._list[i];
+        if (currentSong.id === nextSong.id) {
+            result = currentSong;
             break;
         }
     }
