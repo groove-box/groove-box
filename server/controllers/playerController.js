@@ -1,5 +1,6 @@
 var path = require('path');
 var servicesPath = path.join(__dirname, '..', 'services');
+var soundCloudService = require(path.join(servicesPath, 'soundCloudService'));
 var PlayerService = require(path.join(servicesPath, 'playerService'));
 var playerService = new PlayerService();
 
@@ -10,7 +11,7 @@ module.exports = (function () {
         console.log(req.body);
         console.log('-------');
         console.log('Received URL:', req.body.url);
-        require(path.join(servicesPath, 'soundCloudService')).resolvePermaLinkUrl(req.body.url, function (trackHash) {
+        soundCloudService.resolvePermaLinkUrl(req.body.url, function (trackHash) {
             console.log('Added SoundCloud Track: ', trackHash.trackData.id);
             playerService.addToPlaylist(trackHash);
         }, function () {
