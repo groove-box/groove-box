@@ -1,9 +1,6 @@
 var path = require('path');
 var servicesPath = path.join(__dirname, '..', 'services');
-var SoundcloudService = require(path.join(servicesPath, 'soundcloudService'));
 var PlayerService = require(path.join(servicesPath, 'playerService'));
-var soundcloudService = new SoundcloudService();
-soundcloudService.init();
 var playerService = new PlayerService();
 
 module.exports = (function () {
@@ -13,26 +10,26 @@ module.exports = (function () {
         console.log(req.body);
         console.log('-------');
         console.log('Received URL:', req.body.url);
-        soundcloudService.resolvePermaLinkUrl(req.body.url, function (track_hash) {
-            console.log('Added SoundCloud Track: ', track_hash.track_data.id);
-            playerService.addToPlaylist(track_hash);
+        require(path.join(servicesPath, 'soundCloudService')).resolvePermaLinkUrl(req.body.url, function (trackHash) {
+            console.log('Added SoundCloud Track: ', trackHash.trackData.id);
+            playerService.addToPlaylist(trackHash);
         }, function () {
             console.log("Invalid URL");
         });
         res.json(req.body);
     }
 
-    function stop(req, res, next) {
+    function stop(req, res) {
         playerService.stop();
         res.end();
     }
 
-    function next(req, res, next) {
+    function next(req, res) {
         playerService.next();
         res.end();
     }
 
-    function dump(req, res, next) {
+    function dump(req, res) {
         res.json(playerService.dump());
     }
 

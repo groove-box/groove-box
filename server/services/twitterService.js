@@ -4,7 +4,7 @@ module.exports = (function () {
     function tweet(tweet, callback) {
         tweet = addTimestamp(tweet);
         require('request').post({url: 'http://localhost:3000/tweet', json: true, body: {status: tweet}},
-                function (err, httpResponse, body) {
+                function (err) {
                     if (err) {
                         console.log('Tweeter error: ', err);
                         console.log('Initial tweet: ', tweet);

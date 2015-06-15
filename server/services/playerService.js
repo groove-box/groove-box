@@ -1,25 +1,23 @@
 var path = require('path');
 var Player = require('player');
 var twitterService = require(path.join(__dirname, 'twitterService'));
-var soundcloudService = require(path.join(__dirname, 'soundcloudService'));
 var util = require('util');
-var fs = require('fs');
 var config = require(path.join(__dirname, '..', '..', 'config', 'config.js'));
 
 function PlayerService() {
-    this.player_initialized = false;
+    this.playerInitialized = false;
     this.player = null;
     this.playlist = [];
     this.history = [];
     this.twitterService = twitterService;
-    this.soundcloudService = new soundcloudService();
+    this.soundCloudService = require(path.join(__dirname, 'soundCloudService'));
 }
 
 PlayerService.prototype.init = function () {
     if (this.isInitialized()) {
         return;
     }
-    this.player_initialized = true;
+    this.playerInitialized = true;
     var self = this;
 
     // Initialize with empty playlist.
@@ -36,8 +34,6 @@ PlayerService.prototype.init = function () {
 
     this.player.next = function () {
     };
-
-    //this.loadPlaylist();
 };
 
 PlayerService.prototype.errorHandler = function (err) {
@@ -48,8 +44,8 @@ PlayerService.prototype.errorHandler = function (err) {
 PlayerService.prototype.playStartHandler = function (item) {
     var status = util.format(
             'Currently playing: %s. Check it out: %s',
-            item.track_data.title,
-            item.track_data.permalink_url
+            item.trackData.title,
+            item.trackData.permalink_url
     );
     this.twitterService.tweet(status);
 };
@@ -61,33 +57,21 @@ PlayerService.prototype.playEndHandler = function (item) {
 };
 
 PlayerService.prototype.isInitialized = function () {
-    return this.player_initialized;
+    return this.playerInitialized;
 };
 
 PlayerService.prototype.isPlaying = function () {
     var currentTrack = this.getCurrentTrack();
-
-    var result = !!currentTrack && (currentTrack.finished === false);
-
-    return result;
+    return !!currentTrack && (currentTrack.finished === false);
 };
 
 PlayerService.prototype.getCurrentTrack = function () {
-    var result = this.player.playing;
-
-    return result;
+    return this.player.playing;
 };
 
 PlayerService.prototype.getNextTrack = function () {
     var nextTrackIndex = this.getNextTrackIndex();
-
-    var result = this.player._list[nextTrackIndex];
-
-    return result;
-};
-
-PlayerService.prototype.getCurrentTrackIndex = function () {
-    return (this.getNextTrackIndex() - 1);
+    return this.player._list[nextTrackIndex];
 };
 
 PlayerService.prototype.getNextTrackIndex = function () {
@@ -129,8 +113,6 @@ PlayerService.prototype.add = function (data) {
         this.init();
     }
 
-    var self = this;
-
     this.player.add(data);
 
     if (!this.isPlaying()) {
@@ -165,7 +147,7 @@ PlayerService.prototype.addToPlaylist = function (data) {
 PlayerService.prototype.outputPlaylist = function () {
     for (var i = 0; i < this.player._list.length; i++) {
         var cur = this.player._list[i];
-        console.log((i + 1) + '. votes: ' + cur.votes + ' title: ' + cur.track_data.title);
+        console.log((i + 1) + '. votes: ' + cur.votes + ' title: ' + cur.trackData.title);
     }
 };
 
@@ -178,8 +160,8 @@ PlayerService.prototype.prepareNextTrack = function (callback) {
 PlayerService.prototype.prepareTrack = function (item, callback) {
     var self = this;
 
-    if (item && item.track_data.streamable) {
-        this.soundcloudService.resolveStreamUrl(item.track_data.stream_url, function (resolved_stream_url) {
+    if (item && item.trackData.streamable) {
+        this.soundCloudService.resolveStreamUrl(item.trackData.stream_url, function (resolved_stream_url) {
             item[self.player.options.src] = resolved_stream_url;
 
             if (callback) {
@@ -222,7 +204,7 @@ PlayerService.prototype.getPlaylistItem = function (data) {
 
     for (var i = 0; i < this.player._list.length; i++) {
         var cur = this.player._list[i];
-        if (cur.track_data.id === data.track_data.id) {
+        if (cur.trackData.id === data.trackData.id) {
             result = cur;
             break;
         }
@@ -277,32 +259,6 @@ PlayerService.prototype._sortPlaylistByVotesCallback = function (a, b) {
 
 PlayerService.prototype.dump = function () {
     return this;
-};
-
-PlayerService.prototype.savePlaylist = function () {
-    this.init();
-
-    fs.writeFileSync(config.playerService.playlistLocation, JSON.stringify(this.player._list));
-};
-
-PlayerService.prototype.loadPlaylist = function () {
-    var fileContent = fs.readFileSync(config.playerService.playlistLocation);
-
-    if (fileContent) {
-        var playlist = JSON.parse(fileContent);
-
-        if (playlist) {
-            for (var i in playlist) {
-                var cur = playlist[i];
-
-                if (cur[this.player.options.src]) {
-                    delete cur[this.player.options.src];
-                }
-            }
-
-            this.player._list = playlist;
-        }
-    }
 };
 
 module.exports = PlayerService;

@@ -15,7 +15,7 @@
     "express": "latest",
     "player": "latest",
     "request": "latest",
-    "soundcloud-nodejs-api-wrapper": "git://github.com/monbro/soundcloud-nodejs-api-wrapper.git",
+    "soundcloud-nodejs-api-wrapper": "latest",
     "swig": "latest"
   },
   "repository": {

@@ -7,7 +7,7 @@ module.exports = (function () {
         next(err);
     }
 
-    function error(err, req, res, next) {
+    function error(err, req, res) {
         var errorMap = {
             message: err.message,
             error: {}
