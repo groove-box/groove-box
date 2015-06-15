@@ -3,15 +3,15 @@ var request = require('request');
 module.exports = (function () {
     'use strict';
 
-    function tweet(tweet, callback) {
-        tweet = addTimestamp(tweet);
-        request.post({url: 'http://localhost:3000/tweet', json: true, body: {status: tweet}},
+    function tweet(tweetText, callback) {
+        tweetText = addTimestamp(tweetText);
+        request.post({url: 'http://localhost:3000/tweet', json: true, body: {status: tweetText}},
                 function (err) {
                     if (err) {
                         console.log('Tweeter error: ', err);
-                        console.log('Initial tweet: ', tweet);
+                        console.log('Initial tweet: ', tweetText);
                     } else {
-                        console.log('Tweeted: ' + tweet);
+                        console.log('Tweeted: ' + tweetText);
                     }
                     if (callback) {
                         callback();

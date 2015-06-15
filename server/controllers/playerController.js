@@ -1,22 +1,11 @@
-var path = require('path');
-var servicesPath = path.join(__dirname, '..', 'services');
-var soundCloudService = require(path.join(servicesPath, 'soundCloudService'));
-var PlayerService = require(path.join(servicesPath, 'playerService'));
+var PlayerService = require(require('path').join(__dirname, '..', 'services', 'playerService'));
 var playerService = new PlayerService();
 
 module.exports = (function () {
     'use strict';
 
     function play(req, res) {
-        console.log(req.body);
-        console.log('-------');
-        console.log('Received URL:', req.body.url);
-        soundCloudService.getSong(req.body.url, function (song) {
-            console.log('Added SoundCloud Track: ', song.id);
-            playerService.addToPlaylist(song);
-        }, function () {
-            console.log("Invalid URL");
-        });
+        playerService.addFromSoundCloudUrl(req.body.url);
         res.end();
     }
 

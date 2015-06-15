@@ -25,16 +25,16 @@ var port = normalizePort(process.env.PORT || '1337');
 app.set('port', port);
 var server = require('http').createServer(app);
 
-function onError(error) {
+function onError(err) {
     'use strict';
 
-    if (error.syscall !== 'listen') {
-        throw error;
+    if (err.syscall !== 'listen') {
+        throw err;
     }
 
     var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
-    switch (error.code) {
+    switch (err.code) {
         case 'EACCES':
             console.error(bind + ' requires elevated privileges');
             process.exit(1);
@@ -44,7 +44,7 @@ function onError(error) {
             process.exit(1);
             break;
         default:
-            throw error;
+            throw err;
     }
 }
 
@@ -63,6 +63,8 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 process.on('SIGINT', function () {
+    'use strict';
+
     twitterService.tweet('Party is over! Go home. Be safe! DDaD!', function () {
         process.exit();
     });

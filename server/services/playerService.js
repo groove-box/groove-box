@@ -118,28 +118,37 @@ PlayerService.prototype.add = function (data) {
     }
 };
 
-PlayerService.prototype.addToPlaylist = function (data) {
-    if (!this.isInitialized()) {
-        this.init();
-    }
+PlayerService.prototype.addFromSoundCloudUrl = function (url) {
+    var self = this;
 
-    var playlistItem = this.getPlaylistItem(data);
-    var is_new_entry = !playlistItem;
-    if (is_new_entry) {
-        playlistItem = this._generateNewPlaylistItem(data);
-    }
-    else {
-        playlistItem.votes++;
-        playlistItem.finished = false;
-    }
+    console.log('-------');
+    console.log('Received URL:', url);
+    this.soundCloudService.getSong(url, function (song) {
+        console.log('Added SoundCloud Track: ', song.id);
+        if (!self.isInitialized()) {
+            self.init();
+        }
 
-    if (is_new_entry) {
-        this.add(playlistItem);
-    }
-    else {
-        this._sortPlaylistByVotes();
-    }
-    this.outputPlaylist();
+        var playlistItem = self.getPlaylistItem(song);
+        var is_new_entry = !playlistItem;
+        if (is_new_entry) {
+            playlistItem = self._generateNewPlaylistItem(song);
+        }
+        else {
+            playlistItem.votes++;
+            playlistItem.finished = false;
+        }
+
+        if (is_new_entry) {
+            self.add(playlistItem);
+        }
+        else {
+            self._sortPlaylistByVotes();
+        }
+        self.outputPlaylist();
+    }, function () {
+        console.log('Invalid URL');
+    });
 };
 
 PlayerService.prototype.outputPlaylist = function () {
