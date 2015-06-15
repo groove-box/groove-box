@@ -11,8 +11,8 @@ var request = require('request');
 module.exports = (function () {
     'use strict';
 
-    function getSongFromResolvedPermaLinkUrl(tempLink, successCallback, errorCallback) {
-        request.get(tempLink.location, function (err, response, body) {
+    function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, successCallback, errorCallback) {
+        request.get(resolvedPermaLinkUrl.location, function (err, response, body) {
             if (err) {
                 errorCallback();
             } else {
