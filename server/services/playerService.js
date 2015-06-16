@@ -15,6 +15,9 @@ module.exports = (function () {
             .on('playing', function (song) {
                 twitterService.tweet('Currently playing: ' + song.title + '. Check it out: ' + song.permalink_url);
             });
+    player.next = function () {
+        player.stop();
+    };
 
     function playNextSong() {
         var song = player._list[0];
