@@ -2,6 +2,7 @@ var path = require('path');
 var Player = require('player');
 var soundCloudService = require(path.join(__dirname, 'soundCloudService'));
 var twitterService = require(path.join(__dirname, 'twitterService'));
+var lazy = require('lazy.js');
 
 module.exports = (function () {
     'use strict';
@@ -15,50 +16,16 @@ module.exports = (function () {
                 twitterService.tweet('Currently playing: ' + song.title + '. Check it out: ' + song.permalink_url);
             });
 
-    function getNextTrackIndex() {
-        return player.history.length;
-    }
-
-    function playNextTrack() {
-        var song = player._list[getNextTrackIndex()];
+    function playNextSong() {
+        var song = player._list[0];
         if (song && song.streamable) {
             soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
                 song[player.options.src] = streamUrl;
                 player.play(function (song) {
                     song.finished = true;
-                    playNextTrack();
+                    playNextSong();
                 });
             });
-        }
-    }
-
-    function sortPlaylistByVotes() {
-        if (player._list.length > 1) {
-            var nextTrackIndex = getNextTrackIndex();
-            var sortablePlaylistPart = player._list.slice(nextTrackIndex);
-
-            if (sortablePlaylistPart.length > 0) {
-                sortablePlaylistPart.sort(function (a, b) {
-                    var result = 0;
-                    // We are sorting descending here, so the numbers are reversed.
-                    if (a.votes > b.votes) {
-                        result = -1;
-                    }
-                    else if (a.votes < b.votes) {
-                        result = 1;
-                    }
-
-                    return result;
-                });
-
-                var parametersForSplice = sortablePlaylistPart;
-                parametersForSplice.unshift(nextTrackIndex, player._list.length);
-
-                Array.prototype.splice.apply(
-                        player._list,
-                        parametersForSplice
-                );
-            }
         }
     }
 
@@ -66,7 +33,7 @@ module.exports = (function () {
         console.log('-------');
         console.log('Received URL:', url);
         soundCloudService.getSong(url, function (song) {
-            console.log('Added SoundCloud Track: ', song.id);
+            console.log('Added SoundCloud Song: ', song.id);
 
             var songFromPlaylist;
             player._list.forEach(function (currentSong) {
@@ -80,15 +47,18 @@ module.exports = (function () {
                 song.votes = 1;
                 player.add(song);
 
-                var currentTrack = player.playing;
-                if (!(!!currentTrack && currentTrack.finished === false)) {
-                    playNextTrack()
+                var currentSong = player.playing;
+                if (!(!!currentSong && currentSong.finished === false)) {
+                    playNextSong()
                 }
 
             } else {
                 songFromPlaylist.votes++;
                 songFromPlaylist.finished = false;
-                sortPlaylistByVotes();
+
+                player._list = lazy([player._list[0]]).concat(lazy(player._list).slice(1).sortBy(function (song) {
+                    return song.votes;
+                }, true).toArray()).toArray();
             }
 
             player._list.forEach(function (currentSong, index) {

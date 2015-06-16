@@ -13,6 +13,7 @@
     "consolidate": "latest",
     "debug": "latest",
     "express": "latest",
+    "lazy.js": "latest",
     "player": "latest",
     "request": "latest",
     "soundcloud-nodejs-api-wrapper": "latest",
