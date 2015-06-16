@@ -1,5 +1,4 @@
-var PlayerService = require(require('path').join(__dirname, '..', 'services', 'playerService'));
-var playerService = new PlayerService();
+var playerService = require(require('path').join(__dirname, '..', 'services', 'playerService'));
 
 module.exports = (function () {
     'use strict';

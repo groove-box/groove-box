@@ -1,267 +1,106 @@
 var path = require('path');
 var Player = require('player');
+var soundCloudService = require(path.join(__dirname, 'soundCloudService'));
 var twitterService = require(path.join(__dirname, 'twitterService'));
-var util = require('util');
 
-function PlayerService() {
-    this.playerInitialized = false;
-    this.player = null;
-    this.history = [];
-    this.twitterService = twitterService;
-    this.soundCloudService = require(path.join(__dirname, 'soundCloudService'));
-}
+module.exports = (function () {
+    'use strict';
 
-PlayerService.prototype.init = function () {
-    if (this.isInitialized()) {
-        return;
-    }
-    this.playerInitialized = true;
-    var self = this;
-
-    // Initialize with empty playlist.
-    this.player = new Player([])
-        // Enable streaming.
-            .enable('stream')
-            .on('error', this.errorHandler)
-            .on('playing', function () {
-                self.playStartHandler.apply(self, arguments);
+    var player = new Player([]).enable('stream')
+            .on('error', function (err) {
+                player.stop();
+                console.log(err);
             })
-            .on('playend', function () {
-                self.playEndHandler.apply(self, arguments);
+            .on('playing', function (song) {
+                twitterService.tweet('Currently playing: ' + song.title + '. Check it out: ' + song.permalink_url);
             });
 
-    this.player.next = function () {
-    };
-};
-
-PlayerService.prototype.errorHandler = function (err) {
-    this.stop();
-    console.log(err);
-};
-
-PlayerService.prototype.playStartHandler = function (song) {
-    var status = util.format(
-            'Currently playing: %s. Check it out: %s',
-            song.title,
-            song.permalink_url
-    );
-    this.twitterService.tweet(status);
-};
-
-PlayerService.prototype.playEndHandler = function (item) {
-    item.played++;
-    item.finished = true;
-    this.playNextTrack();
-};
-
-PlayerService.prototype.isInitialized = function () {
-    return this.playerInitialized;
-};
-
-PlayerService.prototype.isPlaying = function () {
-    var currentTrack = this.getCurrentTrack();
-    return !!currentTrack && (currentTrack.finished === false);
-};
-
-PlayerService.prototype.getCurrentTrack = function () {
-    return this.player.playing;
-};
-
-PlayerService.prototype.getNextTrack = function () {
-    var nextTrackIndex = this.getNextTrackIndex();
-    return this.player._list[nextTrackIndex];
-};
-
-PlayerService.prototype.getNextTrackIndex = function () {
-    return this.player.history.length;
-};
-
-PlayerService.prototype.next = function () {
-    this.init();
-
-    var wasPlaying = this.isPlaying();
-
-    this.stop();
-
-    // Only call this if the player is not running. We have the 'playend'
-    // handler for triggering next tracks.
-    if (!wasPlaying) {
-        this.playNextTrack();
-    }
-};
-
-PlayerService.prototype.stop = function () {
-    this.init();
-
-    if (this.isPlaying()) {
-        this.player.stop();
-    }
-};
-
-PlayerService.prototype.play = function () {
-    this.init();
-
-    if (!this.isPlaying()) {
-        this.player.play();
-    }
-};
-
-PlayerService.prototype.add = function (data) {
-    if (!this.isInitialized()) {
-        this.init();
+    function getNextTrackIndex() {
+        return player.history.length;
     }
 
-    this.player.add(data);
-
-    if (!this.isPlaying()) {
-        this.playNextTrack()
-    }
-};
-
-PlayerService.prototype.addFromSoundCloudUrl = function (url) {
-    var self = this;
-
-    console.log('-------');
-    console.log('Received URL:', url);
-    this.soundCloudService.getSong(url, function (song) {
-        console.log('Added SoundCloud Track: ', song.id);
-        if (!self.isInitialized()) {
-            self.init();
+    function playNextTrack() {
+        var song = player._list[getNextTrackIndex()];
+        if (song && song.streamable) {
+            soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
+                song[player.options.src] = streamUrl;
+                player.play(function (song) {
+                    song.finished = true;
+                    playNextTrack();
+                });
+            });
         }
-
-        var playlistItem = self.getPlaylistItem(song);
-        var is_new_entry = !playlistItem;
-        if (is_new_entry) {
-            playlistItem = self._generateNewPlaylistItem(song);
-        }
-        else {
-            playlistItem.votes++;
-            playlistItem.finished = false;
-        }
-
-        if (is_new_entry) {
-            self.add(playlistItem);
-        }
-        else {
-            self._sortPlaylistByVotes();
-        }
-        self.outputPlaylist();
-    }, function () {
-        console.log('Invalid URL');
-    });
-};
-
-PlayerService.prototype.outputPlaylist = function () {
-    for (var i = 0; i < this.player._list.length; i++) {
-        var currentSong = this.player._list[i];
-        console.log((i + 1) + '. votes: ' + currentSong.votes + ' title: ' + currentSong.title);
     }
-};
 
-PlayerService.prototype.prepareNextTrack = function (callback) {
-    var nextTrack = this.getNextTrack();
+    function sortPlaylistByVotes() {
+        if (player._list.length > 1) {
+            var nextTrackIndex = getNextTrackIndex();
+            var sortablePlaylistPart = player._list.slice(nextTrackIndex);
 
-    this.prepareTrack(nextTrack, callback);
-};
+            if (sortablePlaylistPart.length > 0) {
+                sortablePlaylistPart.sort(function (a, b) {
+                    var result = 0;
+                    // We are sorting descending here, so the numbers are reversed.
+                    if (a.votes > b.votes) {
+                        result = -1;
+                    }
+                    else if (a.votes < b.votes) {
+                        result = 1;
+                    }
 
-PlayerService.prototype.prepareTrack = function (song, callback) {
-    var self = this;
+                    return result;
+                });
 
-    if (song && song.streamable) {
-        this.soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
-            song[self.player.options.src] = streamUrl;
+                var parametersForSplice = sortablePlaylistPart;
+                parametersForSplice.unshift(nextTrackIndex, player._list.length);
 
-            if (callback) {
-                callback.apply(self);
+                Array.prototype.splice.apply(
+                        player._list,
+                        parametersForSplice
+                );
             }
+        }
+    }
+
+    function addFromSoundCloudUrl(url) {
+        console.log('-------');
+        console.log('Received URL:', url);
+        soundCloudService.getSong(url, function (song) {
+            console.log('Added SoundCloud Track: ', song.id);
+
+            var songFromPlaylist;
+            player._list.forEach(function (currentSong) {
+                if (currentSong.id === song.id) {
+                    songFromPlaylist = currentSong;
+                }
+            });
+
+            if (!songFromPlaylist) {
+                song.finished = false;
+                song.votes = 1;
+                player.add(song);
+
+                var currentTrack = player.playing;
+                if (!(!!currentTrack && currentTrack.finished === false)) {
+                    playNextTrack()
+                }
+
+            } else {
+                songFromPlaylist.votes++;
+                songFromPlaylist.finished = false;
+                sortPlaylistByVotes();
+            }
+
+            player._list.forEach(function (currentSong, index) {
+                console.log(index + 1 + '. votes: ' + currentSong.votes + ' title: ' + currentSong.title);
+            });
+
+        }, function () {
+            console.log('Invalid URL');
         });
     }
-    // @COMMENT: I guess this is bad, but currently it just works.
-    else if (callback) {
-        callback.apply(self);
+
+    return {
+        addFromSoundCloudUrl: addFromSoundCloudUrl
     }
-};
-
-PlayerService.prototype.playNextTrack = function () {
-    this.prepareNextTrack(
-            function () {
-                this._playerNext();
-            }
-    );
-};
-
-PlayerService.prototype._playerNext = function () {
-    var nextTrackIndex = this.getNextTrackIndex();
-    var player = (this._list) ? this : this.player;
-
-    if (nextTrackIndex >= player._list.length) {
-        player.emit('error', 'No next song was found');
-        player.emit('finish', player.playing);
-        return player;
-    }
-
-    player.stop();
-    player.play(nextTrackIndex);
-
-    return player;
-};
-
-PlayerService.prototype.getPlaylistItem = function (nextSong) {
-    var result;
-
-    for (var i = 0; i < this.player._list.length; i++) {
-        var currentSong = this.player._list[i];
-        if (currentSong.id === nextSong.id) {
-            result = currentSong;
-            break;
-        }
-    }
-
-    return result;
-};
-
-PlayerService.prototype._generateNewPlaylistItem = function (data) {
-    var result = data;
-
-    result.finished = false;
-    result.played = 0;
-    result.votes = 1;
-
-    return result;
-};
-
-PlayerService.prototype._sortPlaylistByVotes = function () {
-    var playlist = this.player._list;
-    if (playlist.length > 1) {
-        var nextTrackIndex = this.getNextTrackIndex();
-        // Get actual sortable part of the playlist.
-        var sortablePlaylistPart = playlist.slice(nextTrackIndex);
-
-        if (sortablePlaylistPart.length > 0) {
-            sortablePlaylistPart.sort(this._sortPlaylistByVotesCallback);
-
-            var parametersForSplice = sortablePlaylistPart;
-            parametersForSplice.unshift(nextTrackIndex, playlist.length);
-
-            Array.prototype.splice.apply(
-                    playlist,
-                    parametersForSplice
-            );
-        }
-    }
-};
-
-PlayerService.prototype._sortPlaylistByVotesCallback = function (a, b) {
-    var result = 0;
-    // We are sorting descending here, so the numbers are reversed.
-    if (a.votes > b.votes) {
-        result = -1;
-    }
-    else if (a.votes < b.votes) {
-        result = 1;
-    }
-
-    return result;
-};
-
-module.exports = PlayerService;
+})();
