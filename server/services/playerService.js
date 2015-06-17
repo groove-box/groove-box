@@ -34,7 +34,7 @@ module.exports = (function () {
         if (song && song.streamable) {
             soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
                 song[player.options.src] = streamUrl;
-                player.play();
+                player.play(getIndexOfNextPlayingSong());
             });
         }
     }
