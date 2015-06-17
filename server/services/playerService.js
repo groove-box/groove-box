@@ -30,7 +30,8 @@ module.exports = (function () {
     }
 
     function playNextSong() {
-        var song = player._list[getIndexOfNextPlayingSong()];
+        var indexOfNextPlayingSong = getIndexOfNextPlayingSong();
+        var song = player._list[indexOfNextPlayingSong];
         if (song && song.streamable) {
             soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
                 song[player.options.src] = streamUrl;
