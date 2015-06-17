@@ -16,6 +16,7 @@ module.exports = (function () {
                 twitterService.tweet('Currently playing: ' + song.title + '. Check it out: ' + song.permalink_url);
             });
     player.next = function () {
+        //TODO this is not working as intended - player is not playing next song in list
         player.stop();
     };
 
@@ -25,7 +26,6 @@ module.exports = (function () {
             soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
                 song[player.options.src] = streamUrl;
                 player.play(function (song) {
-                    song.finished = true;
                     playNextSong();
                 });
             });
@@ -46,18 +46,15 @@ module.exports = (function () {
             });
 
             if (!songFromPlaylist) {
-                song.finished = false;
                 song.votes = 1;
                 player.add(song);
 
-                var currentSong = player.playing;
-                if (!(!!currentSong && currentSong.finished === false)) {
+                if (!player.playing) {
                     playNextSong()
                 }
 
             } else {
                 songFromPlaylist.votes++;
-                songFromPlaylist.finished = false;
 
                 player._list = lazy([player._list[0]]).concat(lazy(player._list).slice(1).sortBy(function (song) {
                     return song.votes;
