@@ -25,8 +25,12 @@ module.exports = (function () {
         }).indexOf(songId)];
     }
 
+    function getIndexOfNextPlayingSong() {
+        return player.history.length;
+    }
+
     function playNextSong() {
-        var song = player._list[0];
+        var song = player._list[getIndexOfNextPlayingSong()];
         if (song && song.streamable) {
             soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
                 song[player.options.src] = streamUrl;
@@ -36,9 +40,11 @@ module.exports = (function () {
     }
 
     function sortNotPlayingSongsDescendingByVotes() {
-        player._list = lazy([player._list[0]]).concat(lazy(player._list).rest().sortBy(function (song) {
-            return song.votes;
-        }, true).toArray()).toArray();
+        var indexOfCurrentlyPlaingSong = getIndexOfNextPlayingSong();
+        player._list = lazy(player._list).initial(player._list.length - indexOfCurrentlyPlaingSong)
+                .concat(lazy(player._list).slice(indexOfCurrentlyPlaingSong).sortBy(function (song) {
+                    return song.votes;
+                }, true).toArray()).toArray();
     }
 
     function logPlaylist() {
