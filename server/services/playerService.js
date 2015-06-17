@@ -41,9 +41,9 @@ module.exports = (function () {
     }
 
     function sortNotPlayingSongsDescendingByVotes() {
-        var indexOfCurrentlyPlaingSong = getIndexOfNextPlayingSong();
-        player._list = lazy(player._list).initial(player._list.length - indexOfCurrentlyPlaingSong)
-                .concat(lazy(player._list).slice(indexOfCurrentlyPlaingSong).sortBy(function (song) {
+        var indexOfNextPlayingSong = getIndexOfNextPlayingSong();
+        player._list = lazy(player._list).initial(player._list.length - indexOfNextPlayingSong)
+                .concat(lazy(player._list).slice(indexOfNextPlayingSong).sortBy(function (song) {
                     return song.votes;
                 }, true).toArray()).toArray();
     }
