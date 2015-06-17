@@ -8,19 +8,7 @@ module.exports = (function () {
         res.end();
     }
 
-    function stop(req, res) {
-        playerService.stop();
-        res.end();
-    }
-
-    function next(req, res) {
-        playerService.next();
-        res.end();
-    }
-
     return {
-        play: play,
-        stop: stop,
-        next: next
+        play: play
     };
 })();
