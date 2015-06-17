@@ -63,7 +63,7 @@ module.exports = (function () {
             if (!songFromPlaylist) {
                 song.votes = 1;
                 player.add(song);
-                if (!player.playing) {
+                if (!player.playing || player.playing.id !== song.id) {
                     playNextSong()
                 }
             } else {
