@@ -19,10 +19,10 @@ module.exports = (function () {
         playNextSong()
     };
 
-    function getSongFromPlaylist(song) {
+    function getSongFromPlaylist(songId) {
         return player._list[lazy(player._list).map(function (currentSong) {
             return currentSong.id
-        }).indexOf(song.id)];
+        }).indexOf(songId)];
     }
 
     function playNextSong() {
@@ -52,7 +52,7 @@ module.exports = (function () {
         console.log('Received URL:', url);
         soundCloudService.getSong(url, function (song) {
             console.log('Added SoundCloud Song: ', song.id);
-            var songFromPlaylist = getSongFromPlaylist();
+            var songFromPlaylist = getSongFromPlaylist(song.id);
             if (!songFromPlaylist) {
                 song.votes = 1;
                 player.add(song);
