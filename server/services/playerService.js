@@ -40,7 +40,7 @@ module.exports = (function () {
         }
     }
 
-    function sortNotPlayingSongsDescendingByVotes() {
+    function sortNotPlayedSongsDescendingByVotes() {
         var indexOfNextPlayingSong = getIndexOfNextPlayingSong();
         player._list = lazy(player._list).initial(player._list.length - indexOfNextPlayingSong)
                 .concat(lazy(player._list).slice(indexOfNextPlayingSong).sortBy(function (song) {
@@ -68,7 +68,7 @@ module.exports = (function () {
                 }
             } else {
                 songFromPlaylist.votes++;
-                sortNotPlayingSongsDescendingByVotes();
+                sortNotPlayedSongsDescendingByVotes();
             }
             logPlaylist();
         }, function () {
