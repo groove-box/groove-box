@@ -7,6 +7,7 @@ var lazy = require('lazy.js');
 module.exports = (function () {
     'use strict';
 
+    var songEndTime = Date.now();
     var player = new Player([]).enable('stream')
             .on('error', function (err) {
                 player.stop();
@@ -19,25 +20,14 @@ module.exports = (function () {
         playNextSong()
     };
 
-    function getSongFromPlaylist(songId) {
-        return player._list[lazy(player._list).map(function (currentSong) {
-            return currentSong.id
-        }).indexOf(songId)];
+    function logPlaylist() {
+        player._list.forEach(function (currentSong, index) {
+            console.log(index + 1 + '. votes: ' + currentSong.votes + ' title: ' + currentSong.title);
+        });
     }
 
     function getIndexOfNextPlayingSong() {
         return player.history.length;
-    }
-
-    function playNextSong() {
-        var indexOfNextPlayingSong = getIndexOfNextPlayingSong();
-        var song = player._list[indexOfNextPlayingSong];
-        if (song && song.streamable) {
-            soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
-                song[player.options.src] = streamUrl;
-                player.play(getIndexOfNextPlayingSong());
-            });
-        }
     }
 
     function sortNotPlayedSongsDescendingByVotes() {
@@ -48,10 +38,26 @@ module.exports = (function () {
                 }, true).toArray()).toArray();
     }
 
-    function logPlaylist() {
-        player._list.forEach(function (currentSong, index) {
-            console.log(index + 1 + '. votes: ' + currentSong.votes + ' title: ' + currentSong.title);
-        });
+    function playNextSong() {
+        var indexOfNextPlayingSong = getIndexOfNextPlayingSong();
+        var song = player._list[indexOfNextPlayingSong];
+        if (song && song.streamable) {
+            soundCloudService.getStreamUrl(song.stream_url, function (streamUrl) {
+                song[player.options.src] = streamUrl;
+                player.play(indexOfNextPlayingSong);
+                songEndTime = Date.now() + song.duration;
+            });
+        }
+    }
+
+    function isPlaying() {
+        return songEndTime >= Date.now();
+    }
+
+    function getSongFromPlaylist(songId) {
+        return player._list[lazy(player._list).map(function (currentSong) {
+            return currentSong.id
+        }).indexOf(songId)];
     }
 
     function addFromSoundCloudUrl(url) {
@@ -63,7 +69,7 @@ module.exports = (function () {
             if (!songFromPlaylist) {
                 song.votes = 1;
                 player.add(song);
-                if (!player.playing || player.playing.id !== song.id) {
+                if (!isPlaying()) {
                     playNextSong()
                 }
             } else {
