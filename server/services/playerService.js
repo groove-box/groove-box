@@ -4,12 +4,6 @@ var soundCloudService = require(require('path').join(__dirname, 'soundCloudServi
 module.exports = (function () {
     'use strict';
 
-    function logPlaylist() {
-        enhancedPlayer.getPlaylist.forEach(function (currentSong, index) {
-            console.log(index + 1 + '. votes: ' + currentSong.votes + ' title: ' + currentSong.title);
-        });
-    }
-
     function next() {
         enhancedPlayer.next();
     }
@@ -34,7 +28,7 @@ module.exports = (function () {
                 songFromPlaylist.votes++;
                 enhancedPlayer.sortNotPlayedSongsDescendingByVotes();
             }
-            logPlaylist();
+            enhancedPlayer.logPlaylist();
         }, function () {
             console.log('Invalid URL');
         });
