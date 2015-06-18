@@ -20,7 +20,7 @@ module.exports = (function () {
             var songFromPlaylist = enhancedPlayer.getSong(song.id);
             if (!songFromPlaylist) {
                 song.votes = 1;
-                enhancedPlayer.add(song);
+                enhancedPlayer.addToPlaylist(song);
                 if (!enhancedPlayer.isPlaying()) {
                     enhancedPlayer.playNextSong()
                 }
