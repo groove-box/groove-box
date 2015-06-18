@@ -3,12 +3,24 @@ var playerService = require(require('path').join(__dirname, '..', 'services', 'p
 module.exports = (function () {
     'use strict';
 
+    function next(req, res) {
+        playerService.next();
+        res.end();
+    }
+
+    function stop(req, res) {
+        playerService.stop();
+        res.end();
+    }
+
     function play(req, res) {
         playerService.addFromSoundCloudUrl(req.body.url);
         res.end();
     }
 
     return {
+        next: next,
+        stop: stop,
         play: play
     };
 })();
