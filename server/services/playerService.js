@@ -5,19 +5,27 @@ var lazy = require('lazy.js');
 module.exports = (function () {
     'use strict';
 
+    function sortNotPlayedSongsDescendingByVotes() {
+        var playlist = enhancedPlayer.playlist;
+        var indexOfNextPlayingSong = enhancedPlayer.getIndexOfNextPlayingSong();
+        enhancedPlayer.playlist = lazy(playlist).initial(playlist.length - indexOfNextPlayingSong)
+                .concat(lazy(playlist).slice(indexOfNextPlayingSong).sortBy(function (song) {
+                    return song.votes;
+                }, true).toArray()).toArray();
+    }
+
     function logPlaylist() {
-        enhancedPlayer._list.forEach(function (currentSong, index) {
+        enhancedPlayer.playlist.forEach(function (currentSong, index) {
             console.log(index + 1 + '. votes: ' + currentSong.votes + ' title: ' + currentSong.title);
         });
     }
 
-    function sortNotPlayedSongsDescendingByVotes() {
-        var playlist = enhancedPlayer._list;
-        var indexOfNextPlayingSong = enhancedPlayer.getIndexOfNextPlayingSong();
-        enhancedPlayer._list = lazy(playlist).initial(playlist.length - indexOfNextPlayingSong)
-                .concat(lazy(playlist).slice(indexOfNextPlayingSong).sortBy(function (song) {
-                    return song.votes;
-                }, true).toArray()).toArray();
+    function next() {
+        enhancedPlayer.next();
+    }
+
+    function stop() {
+        enhancedPlayer.stop();
     }
 
     function addFromSoundCloudUrl(url) {
@@ -25,7 +33,7 @@ module.exports = (function () {
         console.log('Received URL:', url);
         soundCloudService.getSong(url, function (song) {
             console.log('Added SoundCloud Song: ', song.id);
-            var songFromPlaylist = enhancedPlayer.getSongFromPlaylist(song.id);
+            var songFromPlaylist = enhancedPlayer.getSong(song.id);
             if (!songFromPlaylist) {
                 song.votes = 1;
                 enhancedPlayer.add(song);
@@ -40,14 +48,6 @@ module.exports = (function () {
         }, function () {
             console.log('Invalid URL');
         });
-    }
-
-    function next() {
-        enhancedPlayer.next();
-    }
-
-    function stop() {
-        enhancedPlayer.stop();
     }
 
     return {
