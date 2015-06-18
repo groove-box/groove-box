@@ -6,16 +6,16 @@ module.exports = (function () {
     'use strict';
 
     function sortNotPlayedSongsDescendingByVotes() {
-        var playlist = enhancedPlayer.getPlaylist;
+        var playlist = enhancedPlayer.playlist;
         var indexOfNextPlayingSong = enhancedPlayer.getIndexOfNextPlayingSong();
-        enhancedPlayer.setPlaylist(lazy(playlist).initial(playlist.length -
-                indexOfNextPlayingSong).concat(lazy(playlist).slice(indexOfNextPlayingSong).sortBy(function (song) {
-            return song.votes;
-        }, true).toArray()).toArray());
+        enhancedPlayer.playlist = lazy(playlist).initial(playlist.length - indexOfNextPlayingSong)
+                .concat(lazy(playlist).slice(indexOfNextPlayingSong).sortBy(function (song) {
+                    return song.votes;
+                }, true).toArray()).toArray();
     }
 
     function logPlaylist() {
-        enhancedPlayer.getPlaylist.forEach(function (currentSong, index) {
+        enhancedPlayer.playlist.forEach(function (currentSong, index) {
             console.log(index + 1 + '. votes: ' + currentSong.votes + ' title: ' + currentSong.title);
         });
     }
