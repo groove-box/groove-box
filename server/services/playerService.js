@@ -1,6 +1,5 @@
 var enhancedPlayer = require(require('path').join(__dirname, '..', '..', 'lib', 'enhancedPlayer'));
 var soundCloudService = require(require('path').join(__dirname, 'soundCloudService'));
-var lazy = require('lazy.js');
 
 module.exports = (function () {
     'use strict';
