@@ -3,7 +3,6 @@ var path = require('path');
 var twitterCredentials = require(path.join(__dirname, '..', '..', 'config', 'twitterCredentials'));
 var URI = require('URIjs');
 var request = require('request');
-var playerService = require(path.join(__dirname, 'playerService'));
 
 module.exports = (function () {
     'use strict';
@@ -42,14 +41,14 @@ module.exports = (function () {
         return lastUrl;
     }
 
-    function addSongsFromTweets(hashtag) {
+    function addSongsFromTweets(hashtag, callback) {
         client.stream('statuses/filter', {track: hashtag}, function (stream) {
             stream.on('data', function (tweet) {
                 request.head({url: getLastUrlFromTweetText(tweet.text), followAllRedirects: true}, function (err, res) {
                     if (err) {
                         console.log('Twitter error: ' + err);
                     } else {
-                        playerService.addFromSoundCloudUrl(res.request.href);
+                        callback(res.request.href);
                     }
                 });
             });
