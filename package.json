@@ -1,5 +1,5 @@
 {
-  "name": "GrooveBox_Player",
+  "name": "groove-box",
   "version": "0.0.1",
   "private": true,
   "author": "",
@@ -14,13 +14,15 @@
     "debug": "latest",
     "express": "latest",
     "lazy.js": "latest",
+    "mongoose": "latest",
     "player": "latest",
     "request": "latest",
     "soundcloud-nodejs-api-wrapper": "latest",
-    "swig": "latest"
+    "swig": "latest",
+    "twitter": "latest"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/GrooveBoxHH/GrooveBox_Player.git"
+    "url": "https://github.com/groove-box/groove-box.git"
   }
 }

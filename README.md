@@ -1,7 +1,7 @@
-GrooveBox Player
+groove-box
 ----------------
 
-A NodeJS based Player for Soundcloud Songs.
+The jukebox of the 21 century!
 
 Install
 ----------------
@@ -9,8 +9,7 @@ Install
 * Clone repo.
 * Run: npm install
 * Edit the config/credentials.json for your SoundCloud login and app tokens.
-* Start the GrooveBox_Player with: node server.js
-* Install GrooveBox_Tweeter
+* Start the groove-box with: node server.js
 
 Goat
 ----------------

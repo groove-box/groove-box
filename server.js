@@ -53,7 +53,7 @@ function onListening() {
 
     var addr = server.address();
     var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-    require('debug')('GrooveBox_Player:server')('Listening on ' + bind);
+    require('debug')('groove-box:server')('Listening on ' + bind);
 
     twitterService.tweet('Starting to party now! Suggest songs now with our hashtags now!');
 }
