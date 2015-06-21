@@ -4,7 +4,6 @@ var path = require('path');
 
 var app = require(path.join(__dirname, 'config', 'express'));
 var twitterService = require(path.join(__dirname, 'server', 'services', 'twitterService'));
-var playerService = require(path.join(__dirname, 'server', 'services', 'playerService'));
 
 function normalizePort(val) {
     'use strict';
@@ -58,9 +57,7 @@ function onListening() {
 
     var hashtag = 'groov3box_bene';
     twitterService.tweet('Starting to party now! #' + hashtag);
-    twitterService.filterForHashtag(hashtag, function (soundCloudUrl) {
-        playerService.addFromSoundCloudUrl(soundCloudUrl);
-    });
+    twitterService.addSongsFromTweets(hashtag);
 }
 
 server.listen(port);

@@ -1,7 +1,9 @@
 var Twitter = require('twitter');
-var twitterCredentials = require(require('path').join(__dirname, '..', '..', 'config', 'twitterCredentials'));
+var path = require('path');
+var twitterCredentials = require(path.join(__dirname, '..', '..', 'config', 'twitterCredentials'));
 var URI = require('URIjs');
 var request = require('request');
+var playerService = require(path.join(__dirname, 'playerService'));
 
 module.exports = (function () {
     'use strict';
@@ -32,7 +34,7 @@ module.exports = (function () {
         });
     }
 
-    function filterForHashtag(hashtag, callback) {
+    function addSongsFromTweets(hashtag) {
         client.stream('statuses/filter', {track: hashtag}, function (stream) {
             stream.on('data', function (tweet) {
                 console.log(JSON.stringify(tweet.text));
@@ -45,7 +47,7 @@ module.exports = (function () {
                     if (err) {
                         console.log(err)
                     } else {
-                        callback(res.request.href);
+                        playerService.addFromSoundCloudUrl(res.request.href);
                     }
                 });
             });
@@ -57,6 +59,6 @@ module.exports = (function () {
 
     return {
         tweet: tweet,
-        filterForHashtag: filterForHashtag
+        addSongsFromTweets: addSongsFromTweets
     };
 })();
