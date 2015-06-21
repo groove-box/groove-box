@@ -4,6 +4,7 @@ var path = require('path');
 
 var app = require(path.join(__dirname, 'config', 'express'));
 var twitterService = require(path.join(__dirname, 'server', 'services', 'twitterService'));
+var playerService = require(path.join(__dirname, 'server', 'services', 'playerService'));
 
 function normalizePort(val) {
     'use strict';
@@ -55,7 +56,11 @@ function onListening() {
     var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     require('debug')('groove-box:server')('Listening on ' + bind);
 
-    twitterService.tweet('Starting to party now!');
+    var hashtag = 'groov3box_bene';
+    twitterService.tweet('Starting to party now! #' + hashtag);
+    twitterService.filterForHashtag(hashtag, function(soundcloudUrl) {
+        playerService.addFromSoundCloudUrl(soundcloudUrl);
+    });
 }
 
 server.listen(port);

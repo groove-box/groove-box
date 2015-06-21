@@ -19,7 +19,8 @@
     "request": "latest",
     "soundcloud-nodejs-api-wrapper": "latest",
     "swig": "latest",
-    "twitter": "latest"
+    "twitter": "latest",
+    "URIjs": "latest"
   },
   "repository": {
     "type": "git",

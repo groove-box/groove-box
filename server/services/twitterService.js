@@ -1,5 +1,7 @@
 var Twitter = require('twitter');
 var twitterCredentials = require(require('path').join(__dirname, '..', '..', 'config', 'twitterCredentials'));
+var URI = require('URIjs');
+var request = require('request');
 
 module.exports = (function () {
     'use strict';
@@ -10,6 +12,10 @@ module.exports = (function () {
         access_token_key: twitterCredentials.accessTokenKey,
         access_token_secret: twitterCredentials.accessTokenSecret
     });
+
+    function addTimestamp(tweet) {
+        return tweet + ' #' + new Date().getTime();
+    }
 
     function tweet(message, callback) {
         message = addTimestamp(message);
@@ -26,11 +32,31 @@ module.exports = (function () {
         });
     }
 
-    function addTimestamp(tweet) {
-        return tweet + ' #' + new Date().getTime();
+    function filterForHashtag(hashtag, callback) {
+        client.stream('statuses/filter', {track: hashtag}, function (stream) {
+            stream.on('data', function (tweet) {
+                console.log(JSON.stringify(tweet.text));
+                var urls = [];
+                URI.withinString(tweet.text, function (url) {
+                    urls.push(url);
+                    return url;
+                });
+                request.head({url: urls[urls.length - 1], followAllRedirects: true}, function (err, res) {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        callback(res.request.href);
+                    }
+                });
+            });
+            stream.on('error', function (err) {
+                console.log('twitter error: ' + err);
+            });
+        });
     }
 
     return {
-        tweet: tweet
+        tweet: tweet,
+        filterForHashtag: filterForHashtag
     };
 })();
