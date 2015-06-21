@@ -13,7 +13,7 @@ module.exports = (function () {
     });
 
     function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, callback) {
-        request.get(resolvedPermaLinkUrl, function (err, response, song) {
+        request.get(resolvedPermaLinkUrl, function (err, res, song) {
             if (err) {
                 console.log('SoundCloud error: ' + err);
             } else {

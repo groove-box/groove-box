@@ -21,7 +21,7 @@ module.exports = (function () {
 
     function tweet(text, callback) {
         text = addTimestamp(text);
-        client.post('statuses/update', {status: text}, function (err, tweet) {
+        client.post('statuses/update', {status: text}, function (err) {
             if (err) {
                 console.log('Twitter error: ', err);
             } else {
