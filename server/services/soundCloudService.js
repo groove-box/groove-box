@@ -1,15 +1,15 @@
 var soundCloudApiWrapper = require('soundcloud-nodejs-api-wrapper');
-var credentials = require(require('path').join(__dirname, '..', '..', 'config', 'credentials.json'));
+var soundCloudCredentials = require(require('path').join(__dirname, '..', '..', 'config', 'soundCloudCredentials.json'));
 var request = require('request');
 
 module.exports = (function () {
     'use strict';
 
     var soundCloudClientFactory = new soundCloudApiWrapper({
-        client_id: credentials.clientId,
-        client_secret: credentials.clientSecret,
-        username: credentials.username,
-        password: credentials.password
+        client_id: soundCloudCredentials.clientId,
+        client_secret: soundCloudCredentials.clientSecret,
+        username: soundCloudCredentials.username,
+        password: soundCloudCredentials.password
     });
 
     function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, successCallback, errorCallback) {
@@ -33,7 +33,7 @@ module.exports = (function () {
     }
 
     function getStreamUrl(unresolvedStreamUrl, callback) {
-        request.get(unresolvedStreamUrl + '?client_id=' + credentials.clientId, function (err, res) {
+        request.get(unresolvedStreamUrl + '?client_id=' + soundCloudCredentials.clientId, function (err, res) {
             callback(res.request.uri.href);
         });
     }

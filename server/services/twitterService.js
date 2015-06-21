@@ -1,16 +1,24 @@
-var request = require('request');
+var Twitter = require('twitter');
+var twitterCredentials = require(require('path').join(__dirname, '..', '..', 'config', 'twitterCredentials'));
 
 module.exports = (function () {
     'use strict';
 
-    function tweet(tweetText, callback) {
-        tweetText = addTimestamp(tweetText);
-        request.post({url: 'http://localhost:3000/tweet', json: true, body: {status: tweetText}}, function (err) {
+    var client = new Twitter({
+        consumer_key: twitterCredentials.consumerKey,
+        consumer_secret: twitterCredentials.consumerSecret,
+        access_token_key: twitterCredentials.accessTokenKey,
+        access_token_secret: twitterCredentials.accessTokenSecret
+    });
+
+    function tweet(message, callback) {
+        message = addTimestamp(message);
+        client.post('statuses/update', {status: message}, function (err, tweet) {
             if (err) {
                 console.log('Tweeter error: ', err);
-                console.log('Initial tweet: ', tweetText);
+                console.log('Initial tweet: ', message);
             } else {
-                console.log('Tweeted: ' + tweetText);
+                console.log('Tweeted: ' + message);
             }
             if (callback) {
                 callback();

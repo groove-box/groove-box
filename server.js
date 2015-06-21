@@ -55,7 +55,7 @@ function onListening() {
     var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     require('debug')('groove-box:server')('Listening on ' + bind);
 
-    twitterService.tweet('Starting to party now! Suggest songs now with our hashtags now!');
+    twitterService.tweet('Starting to party now!');
 }
 
 server.listen(port);
@@ -65,7 +65,7 @@ server.on('listening', onListening);
 process.on('SIGINT', function () {
     'use strict';
 
-    twitterService.tweet('Party is over! Go home. Be safe! DDaD!', function () {
+    twitterService.tweet('Party is over!', function () {
         process.exit();
     });
 });
