@@ -33,8 +33,8 @@ module.exports = (function () {
     }
 
     function getStreamUrl(unresolvedStreamUrl, callback) {
-        request.get(unresolvedStreamUrl + '?client_id=' + credentials.clientId, function (err, response) {
-            callback(response.request.uri.href);
+        request.get(unresolvedStreamUrl + '?client_id=' + credentials.clientId, function (err, res) {
+            callback(res.request.uri.href);
         });
     }
 
