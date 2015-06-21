@@ -58,8 +58,8 @@ function onListening() {
 
     var hashtag = 'groov3box_bene';
     twitterService.tweet('Starting to party now! #' + hashtag);
-    twitterService.filterForHashtag(hashtag, function(soundcloudUrl) {
-        playerService.addFromSoundCloudUrl(soundcloudUrl);
+    twitterService.filterForHashtag(hashtag, function (soundCloudUrl) {
+        playerService.addFromSoundCloudUrl(soundCloudUrl);
     });
 }
 
