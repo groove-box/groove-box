@@ -15,18 +15,17 @@ module.exports = (function () {
         access_token_secret: twitterCredentials.accessTokenSecret
     });
 
-    function addTimestamp(tweet) {
-        return tweet + ' #' + new Date().getTime();
+    function addTimestamp(text) {
+        return text + ' #' + new Date().getTime();
     }
 
-    function tweet(message, callback) {
-        message = addTimestamp(message);
-        client.post('statuses/update', {status: message}, function (err, tweet) {
+    function tweet(text, callback) {
+        text = addTimestamp(text);
+        client.post('statuses/update', {status: text}, function (err, tweet) {
             if (err) {
-                console.log('Tweeter error: ', err);
-                console.log('Initial tweet: ', message);
+                console.log('Twitter error: ', err);
             } else {
-                console.log('Tweeted: ' + message);
+                console.log('Tweeted: ' + text);
             }
             if (callback) {
                 callback();
@@ -34,25 +33,28 @@ module.exports = (function () {
         });
     }
 
+    function getLastUrlFromTweetText(text) {
+        var lastUrl = '';
+        URI.withinString(text, function (url) {
+            lastUrl = url;
+            return url;
+        });
+        return lastUrl;
+    }
+
     function addSongsFromTweets(hashtag) {
         client.stream('statuses/filter', {track: hashtag}, function (stream) {
             stream.on('data', function (tweet) {
-                console.log(JSON.stringify(tweet.text));
-                var urls = [];
-                URI.withinString(tweet.text, function (url) {
-                    urls.push(url);
-                    return url;
-                });
-                request.head({url: urls[urls.length - 1], followAllRedirects: true}, function (err, res) {
+                request.head({url: getLastUrlFromTweetText(tweet.text), followAllRedirects: true}, function (err, res) {
                     if (err) {
-                        console.log(err)
+                        console.log('Twitter error: ' + err);
                     } else {
                         playerService.addFromSoundCloudUrl(res.request.href);
                     }
                 });
             });
             stream.on('error', function (err) {
-                console.log('twitter error: ' + err);
+                console.log('Twitter error: ' + err);
             });
         });
     }

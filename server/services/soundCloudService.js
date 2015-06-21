@@ -12,22 +12,22 @@ module.exports = (function () {
         password: soundCloudCredentials.password
     });
 
-    function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, successCallback, errorCallback) {
+    function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, callback) {
         request.get(resolvedPermaLinkUrl, function (err, response, song) {
             if (err) {
-                errorCallback();
+                console.log('SoundCloud error: ' + err);
             } else {
-                successCallback(JSON.parse(song));
+                callback(JSON.parse(song));
             }
         });
     }
 
-    function getSong(permaLinkUrl, successCallback, errorCallback) {
+    function getSong(permaLinkUrl, callback) {
         soundCloudClientFactory.client().get('/resolve', {url: permaLinkUrl}, function (err, resolvedPermaLink) {
             if (err) {
-                errorCallback();
+                console.log('SoundCloud error: ' + err);
             } else {
-                getSongFromResolvedPermaLinkUrl(resolvedPermaLink.location, successCallback, errorCallback)
+                getSongFromResolvedPermaLinkUrl(resolvedPermaLink.location, callback)
             }
         });
     }

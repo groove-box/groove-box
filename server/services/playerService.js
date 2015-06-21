@@ -14,9 +14,7 @@ module.exports = (function () {
 
     function addFromSoundCloudUrl(url) {
         console.log('-------');
-        console.log('Received URL:', url);
         soundCloudService.getSong(url, function (song) {
-            console.log('Added SoundCloud Song: ', song.id);
             var songFromPlaylist = enhancedPlayer.getSong(song.id);
             if (!songFromPlaylist) {
                 song.votes = 1;
@@ -29,8 +27,6 @@ module.exports = (function () {
                 enhancedPlayer.sortNotPlayedSongsDescendingByVotes();
             }
             enhancedPlayer.logPlaylist();
-        }, function () {
-            console.log('Invalid URL');
         });
     }
 
