@@ -12,27 +12,15 @@ module.exports = (function () {
         enhancedPlayer.stop();
     }
 
-    function addFromSoundCloudUrl(url) {
-        console.log('-------');
+    function add(url) {
         soundCloudService.getSong(url, function (song) {
-            var songFromPlaylist = enhancedPlayer.getSong(song.id);
-            if (!songFromPlaylist) {
-                song.votes = 1;
-                enhancedPlayer.addToPlaylist(song);
-                if (!enhancedPlayer.isPlaying()) {
-                    enhancedPlayer.playNextSong()
-                }
-            } else {
-                songFromPlaylist.votes++;
-                enhancedPlayer.sortNotPlayedSongsDescendingByVotes();
-            }
-            enhancedPlayer.logPlaylist();
+            enhancedPlayer.add(song);
         });
     }
 
     return {
         next: next,
         stop: stop,
-        addFromSoundCloudUrl: addFromSoundCloudUrl
+        add: add
     }
 })();

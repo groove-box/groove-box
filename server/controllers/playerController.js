@@ -14,7 +14,7 @@ module.exports = (function () {
     }
 
     function play(req, res) {
-        playerService.addFromSoundCloudUrl(req.body.url);
+        playerService.add(req.body.url);
         res.end();
     }
 

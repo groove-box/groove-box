@@ -41,7 +41,7 @@ module.exports = (function () {
         return lastUrl;
     }
 
-    function addSongsFromTweets(hashtag, callback) {
+    function listenForUrlsInTweets(hashtag, callback) {
         client.stream('statuses/filter', {track: hashtag}, function (stream) {
             stream.on('data', function (tweet) {
                 request.head({url: getLastUrlFromTweetText(tweet.text), followAllRedirects: true}, function (err, res) {
@@ -60,6 +60,6 @@ module.exports = (function () {
 
     return {
         tweet: tweet,
-        addSongsFromTweets: addSongsFromTweets
+        listenForUrlsInTweets: listenForUrlsInTweets
     };
 })();
