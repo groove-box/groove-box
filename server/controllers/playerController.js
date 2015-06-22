@@ -18,9 +18,16 @@ module.exports = (function () {
         res.end();
     }
 
+    function dumpNotYetPlayedSongs(req, res) {
+        playerService.dumpNotYetPlayedSongs(function () {
+            res.end();
+        });
+    }
+
     return {
         next: next,
         stop: stop,
-        play: play
+        play: play,
+        dumpNotYetPlayedSongs: dumpNotYetPlayedSongs
     };
 })();

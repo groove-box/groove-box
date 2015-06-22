@@ -2,4 +2,5 @@ node_modules
 out
 config/soundCloudCredentials.json
 config/twitterCredentials.json
+config/twitterConfig.json
 groove-box.i*

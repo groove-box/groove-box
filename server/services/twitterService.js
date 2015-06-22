@@ -1,8 +1,10 @@
 var Twitter = require('twitter');
 var path = require('path');
-var twitterCredentials = require(path.join(__dirname, '..', '..', 'config', 'twitterCredentials'));
-var URI = require('URIjs');
+var configPath = path.join(__dirname, '..', '..', 'config');
+var twitterCredentials = require(path.join(configPath, 'twitterCredentials'));
+var twitterConfig = require(path.join(configPath, 'twitterConfig'));
 var request = require('request');
+var URI = require('URIjs');
 
 module.exports = (function () {
     'use strict';
@@ -28,8 +30,8 @@ module.exports = (function () {
         });
     }
 
-    function listenForUrlsInTweets(hashtag, callback) {
-        client.stream('statuses/filter', {track: hashtag}, function (stream) {
+    function listenForUrlsInTweets(callback) {
+        client.stream('statuses/filter', {track: twitterConfig.hashtag}, function (stream) {
             stream.on('data', function (tweet) {
                 request.head({url: getLastUrlFromTweetText(tweet.text), followAllRedirects: true}, function (err, res) {
                     if (err) {

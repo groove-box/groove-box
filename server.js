@@ -2,9 +2,15 @@
 
 var path = require('path');
 
-var app = require(path.join(__dirname, 'config', 'express'));
-var twitterService = require(path.join(__dirname, 'server', 'services', 'twitterService'));
-var playerService = require(path.join(__dirname, 'server', 'services', 'playerService'));
+var configPath = path.join(__dirname, 'config');
+require(path.join(configPath, 'mongoose'));
+var app = require(path.join(configPath, 'express'));
+
+var twitterConfig = require(path.join(configPath, 'twitterConfig'));
+
+var servicesPath = path.join(__dirname, 'server', 'services');
+var twitterService = require(path.join(servicesPath, 'twitterService'));
+var playerService = require(path.join(servicesPath, 'playerService'));
 
 function normalizePort(val) {
     'use strict';
@@ -56,9 +62,8 @@ function onListening() {
     var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     require('debug')('groove-box:server')('Listening on ' + bind);
 
-    var hashtag = 'groov3box_bene';
-    twitterService.tweet('Starting to party now! #' + hashtag);
-    twitterService.listenForUrlsInTweets(hashtag, function (soundCloudUrl) {
+    twitterService.tweet('Starting to party now! #' + twitterConfig.hashtag);
+    twitterService.listenForUrlsInTweets(function (soundCloudUrl) {
         playerService.add(soundCloudUrl);
     });
 }
@@ -70,7 +75,9 @@ server.on('listening', onListening);
 process.on('SIGINT', function () {
     'use strict';
 
-    twitterService.tweet('Party is over!', function () {
-        process.exit();
+    playerService.dumpNotYetPlayedSongs(function () {
+        twitterService.tweet('Party is over!', function () {
+            process.exit();
+        });
     });
 });

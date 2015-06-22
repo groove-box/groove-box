@@ -1,5 +1,5 @@
 var soundCloudApiWrapper = require('soundcloud-nodejs-api-wrapper');
-var soundCloudCredentials = require(require('path').join(__dirname, '..', '..', 'config', 'soundCloudCredentials.json'));
+var soundCloudCredentials = require(require('path').join(__dirname, '..', '..', 'config', 'soundCloudCredentials'));
 var request = require('request');
 
 module.exports = (function () {
