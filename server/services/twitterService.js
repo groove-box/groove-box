@@ -14,10 +14,6 @@ module.exports = (function () {
         access_token_secret: twitterCredentials.accessTokenSecret
     });
 
-    function addTimestamp(text) {
-        return text + ' #' + new Date().getTime();
-    }
-
     function tweet(text, callback) {
         text = addTimestamp(text);
         client.post('statuses/update', {status: text}, function (err) {
@@ -30,15 +26,6 @@ module.exports = (function () {
                 callback();
             }
         });
-    }
-
-    function getLastUrlFromTweetText(text) {
-        var lastUrl = '';
-        URI.withinString(text, function (url) {
-            lastUrl = url;
-            return url;
-        });
-        return lastUrl;
     }
 
     function listenForUrlsInTweets(hashtag, callback) {
@@ -56,6 +43,19 @@ module.exports = (function () {
                 console.log('Twitter error: ' + err);
             });
         });
+    }
+
+    function addTimestamp(text) {
+        return text + ' #' + new Date().getTime();
+    }
+
+    function getLastUrlFromTweetText(text) {
+        var lastUrl = '';
+        URI.withinString(text, function (url) {
+            lastUrl = url;
+            return url;
+        });
+        return lastUrl;
     }
 
     return {

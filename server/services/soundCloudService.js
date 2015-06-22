@@ -12,16 +12,6 @@ module.exports = (function () {
         password: soundCloudCredentials.password
     });
 
-    function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, callback) {
-        request.get(resolvedPermaLinkUrl, function (err, res, song) {
-            if (err) {
-                console.log('SoundCloud error: ' + err);
-            } else {
-                callback(JSON.parse(song));
-            }
-        });
-    }
-
     function getSong(permaLinkUrl, callback) {
         soundCloudClientFactory.client().get('/resolve', {url: permaLinkUrl}, function (err, resolvedPermaLink) {
             if (err) {
@@ -35,6 +25,16 @@ module.exports = (function () {
     function getStreamUrl(unresolvedStreamUrl, callback) {
         request.get(unresolvedStreamUrl + '?client_id=' + soundCloudCredentials.clientId, function (err, res) {
             callback(res.request.uri.href);
+        });
+    }
+
+    function getSongFromResolvedPermaLinkUrl(resolvedPermaLinkUrl, callback) {
+        request.get(resolvedPermaLinkUrl, function (err, res, song) {
+            if (err) {
+                console.log('SoundCloud error: ' + err);
+            } else {
+                callback(JSON.parse(song));
+            }
         });
     }
 
