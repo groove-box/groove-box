@@ -64,4 +64,4 @@ module.exports = (function () {
         tweet: tweet,
         listenForUrlsInTweets: listenForUrlsInTweets
     };
-})();
+}());

@@ -30,4 +30,4 @@ module.exports = (function () {
         play: play,
         dumpNotYetPlayedSongs: dumpNotYetPlayedSongs
     };
-})();
+}());

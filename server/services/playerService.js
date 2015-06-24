@@ -51,4 +51,4 @@ module.exports = (function () {
         add: add,
         dumpNotYetPlayedSongs: dumpNotYetPlayedSongs
     }
-})();
+}());

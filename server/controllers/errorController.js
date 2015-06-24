@@ -25,4 +25,4 @@ module.exports = (function () {
         notFound: notFound,
         error: error
     };
-})();
+}());
