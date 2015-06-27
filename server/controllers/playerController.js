@@ -18,16 +18,16 @@ module.exports = (function () {
         res.end();
     }
 
-    function dumpNotYetPlayedSongs(req, res) {
-        playerService.dumpNotYetPlayedSongs(function () {
+    function removePreviousDumpedSongsAndDumpNotYetPlayedSongs(req, res) {
+        playerService.removePreviousDumpedSongsAndDumpNotYetPlayedSongs().then(function () {
             res.end();
-        });
+        }).done();
     }
 
     return {
         next: next,
         stop: stop,
         play: play,
-        dumpNotYetPlayedSongs: dumpNotYetPlayedSongs
+        removePreviousDumpedSongsAndDumpNotYetPlayedSongs: removePreviousDumpedSongsAndDumpNotYetPlayedSongs
     };
 }());

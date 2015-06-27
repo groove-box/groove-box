@@ -16,6 +16,7 @@
     "lazy.js": "latest",
     "mongoose": "latest",
     "player": "latest",
+    "q": "latest",
     "request": "latest",
     "soundcloud-nodejs-api-wrapper": "latest",
     "swig": "latest",

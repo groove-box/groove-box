@@ -5,6 +5,7 @@ var twitterCredentials = require(path.join(configPath, 'twitterCredentials'));
 var twitterConfig = require(path.join(configPath, 'twitterConfig'));
 var request = require('request');
 var URI = require('URIjs');
+var Q = require('q');
 
 module.exports = (function () {
     'use strict';
@@ -16,7 +17,8 @@ module.exports = (function () {
         access_token_secret: twitterCredentials.accessTokenSecret
     });
 
-    function tweet(text, callback) {
+    function tweet(text) {
+        var deferred = Q.defer();
         text = addTimestamp(text);
         client.post('statuses/update', {status: text}, function (err) {
             if (err) {
@@ -24,10 +26,9 @@ module.exports = (function () {
             } else {
                 console.log('Tweeted: ' + text);
             }
-            if (callback) {
-                callback();
-            }
+            deferred.resolve();
         });
+        return deferred.promise;
     }
 
     function listenForUrlsInTweets(callback) {

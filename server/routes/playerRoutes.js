@@ -4,6 +4,6 @@ var router = require('express').Router();
 router.post('/next', playerController.next);
 router.post('/stop', playerController.stop);
 router.post('/play', playerController.play);
-router.post('/dump', playerController.dumpNotYetPlayedSongs);
+router.post('/dump', playerController.removePreviousDumpedSongsAndDumpNotYetPlayedSongs);
 
 module.exports = router;

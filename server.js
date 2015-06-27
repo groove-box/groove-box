@@ -63,6 +63,7 @@ function onListening() {
     require('debug')('groove-box:server')('Listening on ' + bind);
 
     twitterService.tweet('Starting to party now! #' + twitterConfig.hashtag);
+    playerService.restoreSongsFromDatabase();
     twitterService.listenForUrlsInTweets(function (soundCloudUrl) {
         playerService.add(soundCloudUrl);
     });
@@ -75,9 +76,9 @@ server.on('listening', onListening);
 process.on('SIGINT', function () {
     'use strict';
 
-    playerService.dumpNotYetPlayedSongs(function () {
-        twitterService.tweet('Party is over!', function () {
-            process.exit();
-        });
+    playerService.removePreviousDumpedSongsAndDumpNotYetPlayedSongs().then(function () {
+        return twitterService.tweet('Party is over!');
+    }).fin(function () {
+        process.exit();
     });
 });
