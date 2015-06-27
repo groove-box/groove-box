@@ -78,7 +78,7 @@ process.on('SIGINT', function () {
 
     playerService.removePreviousDumpedSongsAndDumpNotYetPlayedSongs().then(function () {
         return twitterService.tweet('Party is over!');
-    }).fin(function () {
+    }).then(function () {
         process.exit();
     });
 });
