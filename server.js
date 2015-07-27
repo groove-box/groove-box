@@ -13,19 +13,19 @@ var twitterService = require(path.join(servicesPath, 'twitterService'));
 var playerService = require(path.join(servicesPath, 'playerService'));
 
 function normalizePort(val) {
-    'use strict';
+  'use strict';
 
-    var port = parseInt(val, 10);
+  var port = parseInt(val, 10);
 
-    if (isNaN(port)) {
-        return val;
-    }
+  if (isNaN(port)) {
+    return val;
+  }
 
-    if (port >= 0) {
-        return port;
-    }
+  if (port >= 0) {
+    return port;
+  }
 
-    return false;
+  return false;
 }
 
 var port = normalizePort(process.env.PORT || '1337');
@@ -33,40 +33,40 @@ app.set('port', port);
 var server = require('http').createServer(app);
 
 function onError(err) {
-    'use strict';
+  'use strict';
 
-    if (err.syscall !== 'listen') {
-        throw err;
-    }
+  if (err.syscall !== 'listen') {
+    throw err;
+  }
 
-    var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
-    switch (err.code) {
-        case 'EACCES':
-            console.error(bind + ' requires elevated privileges');
-            process.exit(1);
-            break;
-        case 'EADDRINUSE':
-            console.error(bind + ' is already in use');
-            process.exit(1);
-            break;
-        default:
-            throw err;
-    }
+  switch (err.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw err;
+  }
 }
 
 function onListening() {
-    'use strict';
+  'use strict';
 
-    var addr = server.address();
-    var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-    require('debug')('groove-box:server')('Listening on ' + bind);
+  var addr = server.address();
+  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+  require('debug')('groove-box:server')('Listening on ' + bind);
 
-    twitterService.tweet('Starting to party now! #' + twitterConfig.hashtag);
-    playerService.restoreSongsFromDatabase();
-    twitterService.listenForUrlsInTweets(function (soundCloudUrl) {
-        playerService.add(soundCloudUrl);
-    });
+  twitterService.tweet('Starting to party now! #' + twitterConfig.hashtag);
+  playerService.restoreSongsFromDatabase();
+  twitterService.listenForUrlsInTweets(function (soundCloudUrl) {
+    playerService.add(soundCloudUrl);
+  });
 }
 
 server.listen(port);
@@ -74,11 +74,11 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 process.on('SIGINT', function () {
-    'use strict';
+  'use strict';
 
-    playerService.removePreviousDumpedSongsAndDumpNotYetPlayedSongs().then(function () {
-        return twitterService.tweet('Party is over!');
-    }).then(function () {
-        process.exit();
-    });
+  playerService.removePreviousDumpedSongsAndDumpNotYetPlayedSongs().then(function () {
+    return twitterService.tweet('Party is over!');
+  }).then(function () {
+    process.exit();
+  });
 });
